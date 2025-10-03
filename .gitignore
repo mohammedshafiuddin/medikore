@@ -1,0 +1,64 @@
+# Node.js dependencies (any depth)
+**/node_modules/
+
+# Environment files (any depth)
+**/.env
+**/.env.*.local
+**/.env.local
+
+# Build outputs
+**/dist/
+**/build/
+**/.next/
+**/.expo/
+**/.expo-shared/
+**/.expo-web/
+**/expo-packager-cache/
+**/metro-cache/
+**/.expo-go/
+**/web-build/
+**/.out/
+
+# React Native - iOS
+**/ios/build/
+**/ios/Pods/
+**/ios/Podfile.lock
+**/ios/*.xcworkspace
+**/ios/*.xcodeproj/*
+!**/ios/*.xcodeproj/project.pbxproj
+
+# React Native - Android
+**/android/.gradle/
+**/android/.idea/
+**/android/.cxx/
+**/android/local.properties
+**/android/app/build/
+**/android/build/
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+*.log
+logs
+*.pid
+*.seed
+*.pid.lock
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+coverage/
+*.lcov
+
+# Misc
+*.orig
+
