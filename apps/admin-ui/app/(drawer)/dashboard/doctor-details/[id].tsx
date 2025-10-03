@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, ActivityIndicator, ScrollView } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import tw from '@/app/tailwind';
+import { tw } from '@common_ui';
 import { ThemedView } from '@/components/ThemedView';
 import { MyText } from "@common_ui";
 import { useRouter } from 'expo-router';

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Alert, TextInput } from 'react-native';
 import { MyText } from "@common_ui";
 import { DoctorTodayToken } from 'shared-types';
-import tw from '@/app/tailwind';
+import { tw } from '@common_ui';
 import { Ionicons } from '@expo/vector-icons';
 import { useUpdateTokenStatus } from '@/api-hooks/token.api';
 import { LinearGradient } from 'expo-linear-gradient';

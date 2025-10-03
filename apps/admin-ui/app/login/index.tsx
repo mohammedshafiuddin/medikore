@@ -19,7 +19,7 @@ interface LoginFormInputs {
 
 import { useEffect } from "react";
 import { useState } from "react";
-import tw from "@/app/tailwind";
+import { tw } from "@common_ui";
 import { SESSION_EXPIRED_MSG } from "@common_ui/src/lib/const-strs";
 // import { useNotification } from "@/notif-setup/notif-context";
 import { getJWT, JWT_KEY, saveJWT, saveRoles } from "@/hooks/useJWT";

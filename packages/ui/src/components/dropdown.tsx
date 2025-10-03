@@ -1,4 +1,4 @@
-import tw from "@/app/tailwind";
+import tw from "../lib/tailwind";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";

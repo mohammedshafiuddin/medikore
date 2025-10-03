@@ -27,7 +27,7 @@ import {
 import { useFocusEffect, useRouter } from "expo-router";
 import { IconButton } from "react-native-paper";
 import { colors } from "@common_ui";
-import tw from "../tailwind";
+import { tw } from "@common_ui";
 import { useTheme } from "@common_ui";
 import { MyText } from "@common_ui";
 import { MyButton } from "@common_ui";

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, ScrollView, Image, TouchableOpacity, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { MyText } from "@common_ui";
-import tw from '@/app/tailwind';
+import { tw } from '@common_ui';
 import { useRouter } from 'expo-router';
 import { useGetUserById, useUpdateBusinessUser } from '@/api-hooks/user.api';
 import { useCurrentUserId } from '@/hooks/useCurrentUserId';

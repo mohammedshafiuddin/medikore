@@ -8,7 +8,7 @@ import {
   Alert,
   TextInput,
 } from "react-native";
-import tw from "@/app/tailwind";
+import { tw } from "@common_ui";
 import { MyText } from "@common_ui";
 import { ThemedView } from "@/components/ThemedView";
 import { useAuth } from "@/components/context/auth-context";

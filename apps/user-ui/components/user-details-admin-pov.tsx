@@ -21,7 +21,7 @@ import {
   useUpdateDoctorAvailability,
 } from "@/api-hooks/token.api";
 import { useGetUserById, useUpdateBusinessUser } from "@/api-hooks/user.api";
-import { BottomDialog } from "@/components/dialog";
+import { BottomDialog } from "@common_ui";
 import { User, DashboardDoctor } from "shared-types";
 import AppContainer from "./app-container";
 import DatePicker from "@/components/date-picker";
@@ -29,7 +29,7 @@ import {
   useMarkDoctorLeave,
   useGetDoctorUpcomingLeaves,
 } from "@/api-hooks/doctor.api";
-import Checkbox from "./checkbox";
+import { Checkbox } from "@common_ui";
 import { useUpdateDoctorInning } from "@/api-hooks/doctor.api";
 import OfflineTokenDialog from "./OfflineTokenDialog";
 

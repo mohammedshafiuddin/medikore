@@ -1,9 +1,8 @@
 import React from 'react';
 import { View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { MyText } from "@common_ui";
-import tw from '@/app/tailwind';
+import { tw } from '@common_ui';
 import { Ionicons } from '@expo/vector-icons';
-import AppointmentCard from '@/components/appointment-card';
 import { useUserUpcomingAppointments } from '@/api-hooks/user.api';
 
 interface UpcomingAppointmentsPreviewProps {

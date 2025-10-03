@@ -8,9 +8,9 @@ import {
   View,
   Alert,
 } from "react-native";
-import CustomDropdown from "@/components/dropdown";
-import MultiSelectDropdown from "@/components/multi-select";
-import tw from "@/app/tailwind";
+import { CustomDropdown } from "@common_ui";
+import { MultiSelectDropdown } from "@common_ui";
+import { tw } from "@common_ui";
 import { useRouter } from "expo-router";
 import { Formik } from "formik";
 import * as Yup from "yup";

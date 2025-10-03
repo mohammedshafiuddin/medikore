@@ -13,6 +13,14 @@ import MyTextInput from "./src/components/textinput";
 import BottomDialog, { ConfirmationDialog } from "./src/components/dialog";
 import DatePicker from "./src/components/date-picker";
 import MyText from "./src/components/text";
+import CustomDropdown from "./src/components/dropdown";
+import MultiSelectDropdown from "./src/components/multi-select";
+import ImageViewerURI from "./src/components/image-viewer";
+import ImageCarousel from "./src/components/ImageCarousel";
+import ImageUploader from "./src/components/ImageUploader";
+import Checkbox from "./src/components/checkbox";
+import AppContainer from "./src/components/app-container";
+import tw from "./src/lib/tailwind";
 
 
 export {
@@ -33,4 +41,12 @@ export {
   MyText,
   ConfirmationDialog,
   DatePicker,
+  CustomDropdown,
+  MultiSelectDropdown,
+  ImageViewerURI,
+  ImageCarousel,
+  ImageUploader,
+  Checkbox,
+  AppContainer,
+  tw,
 };

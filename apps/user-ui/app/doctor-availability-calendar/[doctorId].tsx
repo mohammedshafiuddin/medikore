@@ -14,7 +14,7 @@ import MyButton from "@/components/button";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useGetDoctorAvailabilityForNextDays, useUpdateDoctorAvailability } from "@/api-hooks/token.api";
 import AppContainer from "@/components/app-container";
-import Checkbox from "@/components/checkbox";
+import { Checkbox } from "@common_ui";
 import { SuccessToast } from "@/services/toaster";
 import dayjs from "dayjs";
 

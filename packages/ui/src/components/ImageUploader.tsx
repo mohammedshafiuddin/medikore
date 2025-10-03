@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Image, TouchableOpacity } from "react-native";
 import MyText from "./text";
-import tw from "../app/tailwind";
+import tw from '../lib/tailwind';
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { MaterialIcons } from "@expo/vector-icons";
 

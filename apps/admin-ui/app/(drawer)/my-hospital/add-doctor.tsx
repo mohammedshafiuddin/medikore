@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import tw from '@/app/tailwind';
+import { tw } from '@common_ui';
 import { MyText } from "@common_ui";
 import { ThemedView } from '@/components/ThemedView';
 import AppContainer from '@/components/app-container';

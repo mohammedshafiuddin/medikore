@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import tw from '@/app/tailwind';
+import { tw } from '@common_ui';
 import { MyText } from "@common_ui";
 import { ThemedView } from '@/components/ThemedView';
 import { useMyUpcomingTokens, usePastTokens } from '@/api-hooks/token.api';

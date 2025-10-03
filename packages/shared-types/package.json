@@ -1,5 +1,5 @@
 {
-  "name": "@common/shared-types", 
+  "name": "@common_types", 
   "version": "1.0.0",
   "main": "index.ts",
   "private": true,

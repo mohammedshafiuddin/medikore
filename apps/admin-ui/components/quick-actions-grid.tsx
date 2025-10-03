@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import tw from '@/app/tailwind';
+import { tw } from '@common_ui';
 import QuickActionButton from '@/components/quick-action-button';
 
 interface QuickActionsGridProps {

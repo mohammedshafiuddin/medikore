@@ -5,7 +5,7 @@ import AppContainer from '@/components/app-container';
 import { MyText } from "@common_ui";
 import { useDoctorTodaysTokens } from '@/api-hooks/token.api';
 import { DoctorTodayToken } from 'shared-types';
-import tw from '@/app/tailwind';
+import { tw } from '@common_ui';
 import { Ionicons } from '@expo/vector-icons';
 import DoctorTokenCard from './DoctorTokenCard';
 import { LinearGradient } from 'expo-linear-gradient';

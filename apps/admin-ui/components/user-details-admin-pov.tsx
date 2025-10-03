@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { MyTextInput as TextInput } from "@common_ui";
 import { useRouter } from "expo-router";
-import tw from "@/app/tailwind";
+import { tw } from "@common_ui";
 import DoctorDetails from "@/components/doctor-details";
 import { ThemedView } from "@/components/ThemedView";
 import { MyText } from "@common_ui";
@@ -29,7 +29,7 @@ import {
   useMarkDoctorLeave,
   useGetDoctorUpcomingLeaves,
 } from "@/api-hooks/doctor.api";
-import Checkbox from "./checkbox";
+import { Checkbox } from "@common_ui";
 import { useUpdateDoctorInning } from "@/api-hooks/doctor.api";
 import OfflineTokenDialog from "./OfflineTokenDialog";
 

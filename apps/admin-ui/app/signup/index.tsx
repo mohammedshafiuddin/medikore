@@ -13,7 +13,7 @@ import {
 import { useRouter } from "expo-router";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import tw from "@/app/tailwind";
+import { tw } from "@common_ui";
 import useHideDrawerHeader from "@/hooks/useHideDrawerHeader";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import usePickImage from "@/hooks/usePickImage";

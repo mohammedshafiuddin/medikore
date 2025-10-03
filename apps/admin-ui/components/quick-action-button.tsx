@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity, ViewStyle } from 'react-native';
 import { MyText } from "@common_ui";
-import tw from '@/app/tailwind';
+import { tw } from '@common_ui';
 import { Ionicons } from '@expo/vector-icons';
 
 interface QuickActionButtonProps {

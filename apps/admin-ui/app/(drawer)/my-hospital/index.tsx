@@ -2,7 +2,7 @@ import React from 'react';
 import { View, ScrollView, ActivityIndicator, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import tw from '@/app/tailwind';
+import { tw } from '@common_ui';
 import { MyText } from "@common_ui";
 import HorizontalImageScroller from '@/components/HorizontalImageScroller';
 import { MyButton } from '@common_ui';

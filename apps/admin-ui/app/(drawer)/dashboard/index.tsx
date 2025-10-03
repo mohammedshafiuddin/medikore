@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, ActivityIndicator } from 'react-native'
-import tw from '@/app/tailwind'
+import { tw } from "@common_ui";
 import DoctorDashboard from '@/components/doctor-dashboard'
 import { useThemeColor } from '@/hooks/useThemeColor'
 import { MyText } from "@common_ui";

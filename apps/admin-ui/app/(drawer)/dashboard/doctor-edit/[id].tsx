@@ -1,6 +1,6 @@
 import React from "react";
 import { View, TouchableOpacity } from "react-native";
-import tw from "@/app/tailwind";
+import { tw } from "@common_ui";
 import AddBusinessUserForm from "@/components/add-business-user-form";
 import { ThemedView } from "@/components/ThemedView";
 import { MyText } from "@common_ui";

@@ -5,12 +5,11 @@ import {
   TextInput,
   Text,
 } from "react-native";
-import tw from "@/app/tailwind";
+import { tw } from "@common_ui";
 import { MyText } from "@common_ui";
 import { BottomDialog } from "@common_ui";
-import  CustomDropdown from "./dropdown";
+import  CustomDropdown from "@common_ui/src/components/dropdown";
 import dayjs from "dayjs";
-import { DashboardDoctor } from "shared-types";
 import { useCreateOfflineToken } from "@/api-hooks/token.api";
 import { ErrorToast, SuccessToast } from "@/services/toaster";
 

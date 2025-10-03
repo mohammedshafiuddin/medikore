@@ -1,10 +1,10 @@
-import AppContainer from '@/components/app-container'
+import { AppContainer } from "@common_ui";
 import { MyText } from "@common_ui";
 import React, { useState } from 'react'
 import { View, ScrollView, ActivityIndicator, TouchableOpacity, RefreshControl } from 'react-native';
 import { useHospitalTodaysTokens, useDoctorTodaysTokens } from '@/api-hooks/token.api'
 import { getJWT } from '@/hooks/useJWT'
-import tw from '@/app/tailwind';
+import { tw } from '@common_ui';
 import { ThemedView } from '@/components/ThemedView';
 import { useRouter } from 'expo-router';
 import { DoctorTokenSummary, DoctorTodayToken } from 'shared-types';

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Image, TouchableOpacity, Alert } from 'react-native';
 import { MyText } from "@common_ui";
-import tw from '@/app/tailwind';
+import { tw } from '@common_ui';
 import { useGetDoctorById, useGetUserById } from '@/api-hooks/user.api';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';

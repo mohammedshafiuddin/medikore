@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useTheme } from "@common_ui";
-import tw from '@/app/tailwind';
+import { tw } from '@common_ui';
 
 interface Props {
   style?: object;

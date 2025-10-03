@@ -2,7 +2,7 @@ import { MyText } from "@common_ui";
 import { MyButton } from "@common_ui";
 import React from "react";
 import { ScrollView, View, ActivityIndicator, Alert } from "react-native";
-import tw from "@/app/tailwind";
+import { tw } from "@common_ui";
 import { useRouter } from "expo-router";
 import { useGetHospitals, useDeleteHospital } from "@/api-hooks/hospital.api";
 import { Hospital } from "shared-types";

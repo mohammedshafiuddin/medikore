@@ -1,7 +1,7 @@
 import { MyText } from "@common_ui";
 import React from 'react';
 import { ScrollView, View } from 'react-native';
-import tw from '@/app/tailwind';
+import { tw } from '@common_ui';
 import HospitalForm from '@/components/hospital-form';
 import AppContainer from '@/components/app-container';
 import { MaterialIcons } from '@expo/vector-icons';

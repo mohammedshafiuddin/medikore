@@ -10,7 +10,7 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { Link } from "expo-router";
 import MyButton from "@/components/button";
 import MyText from "@/components/text";
-import Checkbox from "@/components/checkbox";
+import { Checkbox } from "@common_ui";
 import { StorageService } from "@/lib/StorageService";
 
 interface LoginFormInputs {
@@ -28,7 +28,7 @@ import { getJWT, JWT_KEY, saveJWT, saveRoles } from "@/hooks/useJWT";
 import { useAuth } from "@/components/context/auth-context";
 import MyTextInput from "@/components/textinput";
 import { useTheme } from "@/app/hooks/theme.context";
-import BottomDialog from "@/components/dialog";
+import { BottomDialog } from "@common_ui";
 import useHideDrawerHeader from "@/hooks/useHideDrawerHeader";
 import { useCurrentUserId } from "@/hooks/useCurrentUserId";
 import DecorativeGraphics from "@/components/decorative-graphics";
