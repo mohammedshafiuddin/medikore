@@ -18,20 +18,3 @@ export function useGetMyDoctors({enabled}: {enabled: boolean}) {
     enabled
   });   
 }
-
-/**
- * Hook to fetch a specific doctor by ID from the my-doctors list
- * This uses the my-doctors endpoint and then filters for the specific doctor
- */
-export function useGetMyDoctorById(doctorId?: number) {
-  const { data: allMyDoctors, ...rest } = useGetMyDoctors({enabled: !!doctorId});
-  
-  const doctor = doctorId && allMyDoctors 
-    ? allMyDoctors.find(doc => doc.id === doctorId) 
-    : undefined;
-  
-  return {
-    ...rest,
-    data: doctor
-  };
-}

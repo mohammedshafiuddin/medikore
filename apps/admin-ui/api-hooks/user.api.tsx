@@ -107,26 +107,6 @@ export function useUserResponsibilities(userId: number | null) {
   });
 }
 
-export function useCreateBusinessUser() {
-  const queryClient = new QueryClient();
-
-  return useMutation<CreateUserResponse, Error, FormData>({
-    mutationFn: async (formData: FormData) => {
-      const response = await axios.post<CreateUserResponse>('/users/business-user', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      return response.data;
-    },
-    onSuccess: () => {
-      // Invalidate and refetch users list query
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-      queryClient.invalidateQueries({ queryKey: ['business-users'] });
-    },
-  });
-}
-
 export interface BusinessUser {
   id: number;
   name: string;
@@ -173,20 +153,6 @@ export function useGetBusinessUsers() {
 /**
  * Hook to update a user's profile
  */
-export function useUpdateUserProfile() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ userId, userData }: { userId: number, userData: UpdateUserProfilePayload }) => {
-      const response = await axios.put<User>(`/users/${userId}`, userData);
-      return response.data;
-    },
-    onSuccess: (_, variables) => {
-      // Invalidate and refetch relevant queries
-      queryClient.invalidateQueries({ queryKey: ['user', 'user-details', variables.userId] });
-    },
-  });
-}
 
 /**
  * Hook to fetch the current user's upcoming appointments

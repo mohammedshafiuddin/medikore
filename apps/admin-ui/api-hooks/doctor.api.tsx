@@ -2,23 +2,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "@/services/axios";
 import { Doctor, DoctorSpecialization as Specialization } from "shared-types";
 
-export interface GetDoctorsResponse {
-  doctors: Doctor[];
-}
-
-/**
- * Hook to fetch all doctors
- */
-export function useGetDoctors() {
-  return useQuery<Doctor[]>({
-    queryKey: ['doctors'],
-    queryFn: async () => {
-      const response = await axios.get('/doctors');
-      return response.data;
-    }
-  });
-}
-
 /**
  * Hook to fetch doctors who are not associated with any hospital
  */

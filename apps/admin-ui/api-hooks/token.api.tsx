@@ -132,26 +132,6 @@ export function useUpdateDoctorAvailability() {
 /**
  * Hook to book a token for a doctor
  */
-export function useBookToken() {
-  const queryClient = useQueryClient();
-  
-  return useMutation<BookTokenResponse, Error, BookTokenPayload>({
-    mutationFn: async (data: BookTokenPayload) => {
-      const response = await axios.post<BookTokenResponse>('/tokens/book', data);
-      return response.data;
-    },
-    onSuccess: (_, variables) => {
-      // Invalidate and refetch doctor availability queries
-      queryClient.invalidateQueries({ queryKey: ['doctor-availability', variables.doctorId] });
-      queryClient.invalidateQueries({ queryKey: ['doctor-availabilities', variables.doctorId] });
-      queryClient.invalidateQueries({ queryKey: ['doctor-availability-next-days', variables.doctorId] });
-      
-      // Also invalidate the user's tokens
-      queryClient.invalidateQueries({ queryKey: ['user-tokens', variables.userId] });
-    }
-  });
-}
-
 /**
  * Hook to fetch the current user's upcoming tokens
  */
