@@ -246,6 +246,8 @@ export const tokenInfoTable = pgTable(
 		description: varchar({ length: 1000 }),
 		status: varchar("status", { length: 20 }).default("UPCOMING"), // New status field
 		consultationNotes: varchar("consultation_notes", { length: 1000 }), // New consultation notes field
+		doctorNotes: varchar("doctor_notes", {length: 1000}),
+		imageUrls: varchar("image_urls", {length: 512}),
 		createdAt: date("created_at").notNull().default("now()"),
 	},
 	(t) => ({

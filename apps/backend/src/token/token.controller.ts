@@ -886,16 +886,17 @@ export const getDoctorTodaysTokens = async (req: Request, res: Response, next: N
         patientName: token.user.name,
         patientMobile: token.user.mobile,
         description: token.description,
+        status: token.status
       })),
-      ...offlineTokens.map(token => ({
-        type: 'offline',
-        id: token.id,
-        queueNum: token.tokenNum,
-        patientId: null, // Offline tokens don't have a registered userId
-        patientName: token.patientName,
-        patientMobile: token.mobileNumber,
-        description: token.description,
-      })),
+      // ...offlineTokens.map(token => ({
+      //   type: 'offline',
+      //   id: token.id,
+      //   queueNum: token.tokenNum,
+      //   patientId: null, // Offline tokens don't have a registered userId
+      //   patientName: token.patientName,
+      //   patientMobile: token.mobileNumber,
+      //   description: token.description,
+      // })),
     ].sort((a, b) => a.queueNum - b.queueNum);
     
     // Current token number (consultation in progress)
@@ -904,15 +905,10 @@ export const getDoctorTodaysTokens = async (req: Request, res: Response, next: N
     
     // Format the tokens with patient information and status
     const formattedTokens: DoctorTodayToken[] = allTokens.map(token => {
-      let status: 'UPCOMING' | 'IN_PROGRESS' | 'COMPLETED' | 'MISSED' | 'CANCELLED';
+      // let status: 'UPCOMING' | 'IN_PROGRESS' | 'COMPLETED' | 'MISSED' | 'CANCELLED';
+      let status: any;
       
-      if (token.queueNum < (currentTokenNumber || 0)) {
-        status = 'COMPLETED';
-      } else if (token.queueNum === currentTokenNumber) {
-        status = 'IN_PROGRESS';
-      } else {
-        status = 'UPCOMING';
-      }
+      status = String(token.status)
       
       return {
         id: token.id,
