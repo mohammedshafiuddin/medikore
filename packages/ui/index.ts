@@ -23,6 +23,7 @@ import Checkbox from "./src/components/checkbox";
 import AppContainer from "./src/components/app-container";
 import tw from "./src/lib/tailwind";
 import BottomDropdown from './src/components/bottom-dropdown';
+import SearchBar from './src/components/search-bar'
 
 
 export {
@@ -52,5 +53,6 @@ export {
   Checkbox,
   AppContainer,
   tw,
-  BottomDropdown
+  BottomDropdown,
+  SearchBar
 };

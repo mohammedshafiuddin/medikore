@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import AppContainer from "@/components/app-container";
 import { BottomDropdown, MyText, SearchBar } from "@common_ui";
-import { useDoctorTodaysTokens } from "@/api-hooks/token.api";
+import { useDoctorTodaysTokens, useSearchDoctorTokens } from "@/api-hooks/token.api";
 import { DoctorTodayToken } from "@common_ui/shared-types";
 import { tw } from "@common_ui";
 import { Ionicons } from "@expo/vector-icons";
@@ -22,7 +22,6 @@ export default function DoctorTokensPage() {
 
   const [currDoctorId, setCurrDoctorId] = useState<number | null>(null);
   const [searchText, setSearchText] = useState("");
-  // const doctorId = typeof id === 'string' ? parseInt(id) : 0;
   const doctorId = currDoctorId;
   // Define tab configuration
   const TABS = {
@@ -38,6 +37,7 @@ export default function DoctorTokensPage() {
   const { data, isLoading, isError, error, refetch } =
     useDoctorTodaysTokens(doctorId);
   const { data: doctorsData } = useGetMyDoctors({ enabled: true });
+  const { data: searchResults } = useSearchDoctorTokens(doctorId, searchText);
 
   React.useEffect(() => {
     if (doctorsData && doctorsData.length > 0) {
@@ -66,8 +66,8 @@ export default function DoctorTokensPage() {
     <AppContainer>
       <ScrollView style={tw`flex-1 bg-gray-50`}>
         <View style={tw`p-5`}>
-          <View style={tw`flex-row items-center mb-4`}>
-            <View style={tw`flex-1`}>
+          <View style={tw`flex-col mb-4`}>
+            <View style={tw`flex-1 `}>
               <BottomDropdown
                 // value={doctorId.toString()}
                 value={String(currDoctorId)}
@@ -81,7 +81,7 @@ export default function DoctorTokensPage() {
               />
             </View>
             <SearchBar
-              containerStyle={tw`flex-1 ml-2`}
+              containerStyle={tw`flex-1 mt-4`}
               value={searchText}
               onChangeText={setSearchText}
               onSearch={() => {
@@ -91,47 +91,60 @@ export default function DoctorTokensPage() {
             />
           </View>
 
-          {/* Tab navigation for doctor's tokens */}
-          <TabNavigation
-            tabs={[
-              { key: TABS.UPCOMING, title: "Upcoming" },
-              { key: TABS.COMPLETED, title: "Completed" },
-              { key: TABS.NO_SHOW, title: "No Show" },
-            ]}
-            activeTab={activeTab}
-            onTabChange={(tab) => setActiveTab(tab as TabType)}
-          />
+          {!searchText ? (
+            <>
+              <TabNavigation
+                tabs={[
+                  { key: TABS.UPCOMING, title: "Upcoming" },
+                  { key: TABS.COMPLETED, title: "Completed" },
+                  { key: TABS.NO_SHOW, title: "No Show" },
+                ]}
+                activeTab={activeTab}
+                onTabChange={(tab) => setActiveTab(tab as TabType)}
+              />
 
-          {isLoading ? (
-            <View style={tw`items-center justify-center py-12`}>
-              <ActivityIndicator size="large" color="#4361ee" />
-              <MyText style={tw`mt-4 text-gray-600`}>Loading tokens...</MyText>
-            </View>
-          ) : isError ? (
-            <View
-              style={tw`bg-red-50 p-5 rounded-2xl shadow mb-4 border border-red-200`}
-            >
-              <MyText style={tw`text-red-700 font-medium`}>
-                Error loading tokens:{" "}
-                {error instanceof Error ? error.message : "Unknown error"}
-              </MyText>
-              <TouchableOpacity
-                style={tw`bg-blue-600 px-5 py-3 rounded-xl mt-4 self-start`}
-                onPress={() => refetch()}
-              >
-                <MyText style={tw`text-white font-bold`}>Retry</MyText>
-              </TouchableOpacity>
-            </View>
-          ) : data?.tokens && data.tokens.length > 0 ? (
-            filterTokensByStatus(data.tokens).map((token: DoctorTodayToken) => (
-              <DoctorTokenCard key={token.id} token={token} />
-            ))
+              {isLoading ? (
+                <View style={tw`items-center justify-center py-12`}>
+                  <ActivityIndicator size="large" color="#4361ee" />
+                  <MyText style={tw`mt-4 text-gray-600`}>
+                    Loading tokens...
+                  </MyText>
+                </View>
+              ) : isError ? (
+                <View
+                  style={tw`bg-red-50 p-5 rounded-2xl shadow mb-4 border border-red-200`}
+                >
+                  <MyText style={tw`text-red-700 font-medium`}>
+                    Error loading tokens:{" "}
+                    {error instanceof Error ? error.message : "Unknown error"}
+                  </MyText>
+                  <TouchableOpacity
+                    style={tw`bg-blue-600 px-5 py-3 rounded-xl mt-4 self-start`}
+                    onPress={() => refetch()}
+                  >
+                    <MyText style={tw`text-white font-bold`}>Retry</MyText>
+                  </TouchableOpacity>
+                </View>
+              ) : data?.tokens && data.tokens.length > 0 ? (
+                filterTokensByStatus(data.tokens).map(
+                  (token: DoctorTodayToken) => (
+                    <DoctorTokenCard key={token.id} token={token} />
+                  )
+                )
+              ) : (
+                <View
+                  style={tw`bg-white p-8 rounded-2xl shadow-lg items-center`}
+                >
+                  <Ionicons name="calendar-outline" size={56} color="#9ca3af" />
+                  <MyText style={tw`text-center text-gray-500 mt-4 text-lg`}>
+                    No tokens available for this doctor today.
+                  </MyText>
+                </View>
+              )}
+            </>
           ) : (
-            <View style={tw`bg-white p-8 rounded-2xl shadow-lg items-center`}>
-              <Ionicons name="calendar-outline" size={56} color="#9ca3af" />
-              <MyText style={tw`text-center text-gray-500 mt-4 text-lg`}>
-                No tokens available for this doctor today.
-              </MyText>
+            <View style={tw`bg-white p-8 rounded-2xl shadow-lg`}>
+              {searchResults?.map((token) => <DoctorTokenCard key={token.id} token={token} />)}
             </View>
           )}
         </View>

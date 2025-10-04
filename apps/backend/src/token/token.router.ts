@@ -7,7 +7,8 @@ import {
   getDoctorTodaysTokens,
   updateTokenStatus,
   createOfflineToken,
-  createLocalToken
+  createLocalToken,
+  searchToken
 } from './token.controller';
 import { verifyToken } from '../middleware/auth';
 
@@ -68,6 +69,13 @@ router.patch('/:id/status', verifyToken, updateTokenStatus);
  * @access  Private - Requires authentication (hospital admin only)
  */
 router.post('/offline', verifyToken, createOfflineToken);
+
+/**
+ * @route   POST /api/token/offline
+ * @desc    Create an offline token for a doctor
+ * @access  Private - Requires authentication (hospital admin only)
+ */
+router.get('/search', verifyToken, searchToken);
 
 
 export default router;

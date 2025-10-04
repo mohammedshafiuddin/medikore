@@ -12,7 +12,8 @@ import {
   PastToken,
   PastTokensResponse,
   HospitalTodaysTokensResponse,
-  DoctorTodaysTokensResponse
+  DoctorTodaysTokensResponse,
+  DoctorTodayToken
 } from "@common_ui/shared-types";
 
 interface SingleDoctorAvailabilityResponse {
@@ -262,13 +263,13 @@ export function useCreateLocalToken() {
  * @param doctorId The ID of the doctor
  * @param query The search query
  */
-export function useSearchDoctorTokens(doctorId: number, query: string) {
+export function useSearchDoctorTokens(doctorId: number | null, query: string) {
   return useQuery<DoctorTodayToken[]>({
     queryKey: ['search-doctor-tokens', doctorId, query],
     queryFn: async () => {
       const response = await axios.get(`/tokens/search?doctorId=${doctorId}&query=${encodeURIComponent(query)}`);
       return response.data;
     },
-    enabled: !!query && query.trim().length > 0,
+    enabled: !!query && query.trim().length > 0 && !!doctorId,
   });
 }
