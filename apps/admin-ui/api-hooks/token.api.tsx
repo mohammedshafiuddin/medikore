@@ -177,7 +177,7 @@ export function useHospitalTodaysTokens() {
  * Shows all tokens for the doctor with detailed information
  * @param doctorId The ID of the doctor
  */
-export function useDoctorTodaysTokens(doctorId: number) {
+export function useDoctorTodaysTokens(doctorId: number | null) {
   return useQuery<DoctorTodaysTokensResponse>({
     queryKey: ['doctor-todays-tokens', doctorId],
     queryFn: async () => {
