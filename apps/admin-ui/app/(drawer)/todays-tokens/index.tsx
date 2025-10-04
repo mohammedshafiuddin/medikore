@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import AppContainer from "@/components/app-container";
-import { BottomDropdown, MyText } from "@common_ui";
+import { BottomDropdown, MyText, SearchBar } from "@common_ui";
 import { useDoctorTodaysTokens } from "@/api-hooks/token.api";
 import { DoctorTodayToken } from "@common_ui/shared-types";
 import { tw } from "@common_ui";
@@ -21,6 +21,7 @@ export default function DoctorTokensPage() {
   const router = useRouter();
 
   const [currDoctorId, setCurrDoctorId] = useState<number | null>(null);
+  const [searchText, setSearchText] = useState("");
   // const doctorId = typeof id === 'string' ? parseInt(id) : 0;
   const doctorId = currDoctorId;
   // Define tab configuration
@@ -65,17 +66,30 @@ export default function DoctorTokensPage() {
     <AppContainer>
       <ScrollView style={tw`flex-1 bg-gray-50`}>
         <View style={tw`p-5`}>
-          <BottomDropdown
-            // value={doctorId.toString()}
-            value={String(currDoctorId)}
-            onChange={(id) => setCurrDoctorId(Number(id))}
-            options={
-              doctorsData?.map((doc) => ({
-                label: doc.name,
-                value: String(doc.id),
-              })) || []
-            }
-          />
+          <View style={tw`flex-row items-center mb-4`}>
+            <View style={tw`flex-1`}>
+              <BottomDropdown
+                // value={doctorId.toString()}
+                value={String(currDoctorId)}
+                onChange={(id) => setCurrDoctorId(Number(id))}
+                options={
+                  doctorsData?.map((doc) => ({
+                    label: doc.name,
+                    value: String(doc.id),
+                  })) || []
+                }
+              />
+            </View>
+            <SearchBar
+              containerStyle={tw`flex-1 ml-2`}
+              value={searchText}
+              onChangeText={setSearchText}
+              onSearch={() => {
+                // TODO: Implement search functionality
+              }}
+              placeholder="Search..."
+            />
+          </View>
 
           {/* Tab navigation for doctor's tokens */}
           <TabNavigation
