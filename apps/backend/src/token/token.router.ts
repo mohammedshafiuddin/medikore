@@ -3,8 +3,6 @@ import {
   bookToken,
   updateDoctorAvailability,
   getDoctorAvailabilityForNextDays,
-  getMyUpcomingTokens,
-  getMyPastTokens,
   getHospitalTodaysTokens,
   getDoctorTodaysTokens,
   updateTokenStatus,
@@ -35,20 +33,6 @@ router.post('/doctor-availability', updateDoctorAvailability);
  * @access  Public
  */
 router.get('/doctor-availability/next-days', getDoctorAvailabilityForNextDays);
-
-/**
- * @route   GET /api/token/my-tokens
- * @desc    Get current user's upcoming tokens
- * @access  Private - Requires authentication
- */
-router.get('/my-tokens', verifyToken, getMyUpcomingTokens);
-
-/**
- * @route   GET /api/token/my-past-tokens
- * @desc    Get current user's past tokens
- * @access  Private - Requires authentication
- */
-router.get('/my-past-tokens', verifyToken, getMyPastTokens);
 
 /**
  * @route   POST /api/token/local-token

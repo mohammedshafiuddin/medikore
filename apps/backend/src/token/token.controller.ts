@@ -372,154 +372,6 @@ export const getDoctorAvailabilityForNextDays = async (req: Request, res: Respon
   }
 };
 
-/**
- * Get all upcoming tokens for the current user
- * This endpoint returns only future tokens (today or later), not past ones
- * 
- * @param req Request object with authenticated user
- * @param res Response object
- * @param next Next function
- */
-export const getMyUpcomingTokens = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    if (!req.user || !req.user.userId) {
-      throw new ApiError("User not authenticated", 401);
-    }
-
-    const userId = req.user.userId;
-    
-    // Get current date in YYYY-MM-DD format
-    const today = new Date();
-    const formattedToday = today.toISOString().split('T')[0];
-    
-    // Query tokens for this user that are from today onwards
-    const tokens = await db.query.tokenInfoTable.findMany({
-      where: and(
-        eq(tokenInfoTable.userId, userId),
-        gte(tokenInfoTable.tokenDate, formattedToday)
-      ),
-      orderBy: [tokenInfoTable.tokenDate, tokenInfoTable.queueNum],
-      with: {
-        doctor: {
-          columns: {
-            id: true,
-            name: true,
-            mobile: true,
-            profilePicUrl: true,
-          }
-        }
-      }
-    });
-    
-    // For each token, fetch the current consultation number from doctorAvailability
-    const tokensWithConsultationNumbers = await Promise.all(tokens.map(async (token) => {
-      // Get the doctor's availability for this token's date
-      const availability = await db.query.doctorAvailabilityTable.findFirst({
-        where: and(
-          eq(doctorAvailabilityTable.doctorId, token.doctorId),
-          eq(doctorAvailabilityTable.date, token.tokenDate)
-        )
-      });
-      
-      return {
-        ...token,
-        currentConsultationNumber: availability?.consultationsDone || 0
-      };
-    }));
-    
-    // Format the response with relevant token information
-    const formattedTokens: UpcomingToken[] = tokensWithConsultationNumbers.map(token => ({
-      id: token.id,
-      tokenDate: token.tokenDate,
-      queueNumber: token.queueNum,
-      description: token.description,
-      createdAt: token.createdAt,
-      currentConsultationNumber: token.currentConsultationNumber,
-      doctor: {
-        id: token.doctor.id,
-        name: token.doctor.name,
-        mobile: token.doctor.mobile,
-        profilePicUrl: token.doctor.profilePicUrl
-      }
-    }));
-    
-    const response: MyTokensResponse = {
-      message: "Upcoming tokens retrieved successfully",
-      tokens: formattedTokens
-    };
-    
-    res.status(200).json(response);
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * Get all past tokens for the current user
- * This endpoint returns only past tokens (before today), not upcoming ones
- * 
- * @param req Request object with authenticated user
- * @param res Response object
- * @param next Next function
- */
-export const getMyPastTokens = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    if (!req.user || !req.user.userId) {
-      throw new ApiError("User not authenticated", 401);
-    }
-
-    const userId = req.user.userId;
-    
-    // Get current date in YYYY-MM-DD format
-    const today = new Date();
-    const formattedToday = today.toISOString().split('T')[0];
-    
-    // Query tokens for this user that are before today
-    const tokens = await db.query.tokenInfoTable.findMany({
-      where: and(
-        eq(tokenInfoTable.userId, userId),
-        sql`${tokenInfoTable.tokenDate} < ${formattedToday}`
-      ),
-      orderBy: [desc(tokenInfoTable.tokenDate), tokenInfoTable.queueNum],
-      with: {
-        doctor: {
-          columns: {
-            id: true,
-            name: true,
-            mobile: true,
-            profilePicUrl: true,
-          }
-        }
-      }
-    });
-    
-    // Format the response with relevant token information
-    const formattedTokens: PastToken[] = tokens.map(token => ({
-      id: token.id,
-      tokenDate: token.tokenDate,
-      queueNumber: token.queueNum,
-      description: token.description,
-      createdAt: token.createdAt,
-      // For past tokens, default to 'COMPLETED' for simplicity
-      status: 'COMPLETED',
-      doctor: {
-        id: token.doctor.id,
-        name: token.doctor.name,
-        mobile: token.doctor.mobile,
-        profilePicUrl: token.doctor.profilePicUrl
-      }
-    }));
-    
-    const response: PastTokensResponse = {
-      message: "Past tokens retrieved successfully",
-      tokens: formattedTokens
-    };
-    
-    res.status(200).json(response);
-  } catch (error) {
-    next(error);
-  }
-};
 
 /**
  * Get today's tokens for all doctors in a hospital (hospital admin view)
@@ -626,7 +478,11 @@ export const getHospitalTodaysTokens = async (req: Request, res: Response, next:
           eq(tokenInfoTable.tokenDate, today)
         ),
         with: {
-          user: true, // Include patient details
+          user: {
+            with: {
+              mobileNumber: true
+            }
+          } // Include patient details
         },
         orderBy: tokenInfoTable.queueNum,
       });
@@ -645,8 +501,9 @@ export const getHospitalTodaysTokens = async (req: Request, res: Response, next:
           queueNumber: token.queueNum,
           patientId: token.userId,
           patientName: token.user.name,
-          patientMobile: token.user.mobile,
-          description: token.description
+          patientMobile: token.user.mobileNumber?.mobile,
+          description: token.description,
+          status: token.status!,
         };
       });
       

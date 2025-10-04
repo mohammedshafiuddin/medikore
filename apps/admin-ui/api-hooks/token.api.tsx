@@ -256,3 +256,19 @@ export function useCreateLocalToken() {
     },
   });
 }
+
+/**
+ * Hook to search tokens by doctor ID and query
+ * @param doctorId The ID of the doctor
+ * @param query The search query
+ */
+export function useSearchDoctorTokens(doctorId: number, query: string) {
+  return useQuery<DoctorTodayToken[]>({
+    queryKey: ['search-doctor-tokens', doctorId, query],
+    queryFn: async () => {
+      const response = await axios.get(`/tokens/search?doctorId=${doctorId}&query=${encodeURIComponent(query)}`);
+      return response.data;
+    },
+    enabled: !!query && query.trim().length > 0,
+  });
+}

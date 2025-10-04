@@ -24,7 +24,7 @@ export interface DoctorTodayToken {
   queueNumber: number;
   patientId: number | null;
   patientName: string;
-  patientMobile: string;
+  patientMobile?: string;
   description: string | null;
   status: 'UPCOMING' | 'IN_PROGRESS' | 'COMPLETED' | 'MISSED' | 'CANCELLED'; // Made optional
   // status: string; // 'UPCOMING' | 'IN_PROGRESS' | 'COMPLETED' | 'MISSED' | 'CANCELLED'; // Made optional
