@@ -8,7 +8,8 @@ import {
   getHospitalTodaysTokens,
   getDoctorTodaysTokens,
   updateTokenStatus,
-  createOfflineToken
+  createOfflineToken,
+  createLocalToken
 } from './token.controller';
 import { verifyToken } from '../middleware/auth';
 
@@ -50,6 +51,13 @@ router.get('/my-tokens', verifyToken, getMyUpcomingTokens);
 router.get('/my-past-tokens', verifyToken, getMyPastTokens);
 
 /**
+ * @route   POST /api/token/local-token
+ * @desc    Create a local token for a doctor
+ * @access  Private - Requires authentication
+*/
+router.post('/local-token', verifyToken, createLocalToken);
+
+/**
  * @route   GET /api/token/hospital-today
  * @desc    Get today's tokens for all doctors in a hospital (hospital admin view)
  * @access  Private - Requires authentication (hospital admin only)
@@ -76,5 +84,6 @@ router.patch('/:id/status', verifyToken, updateTokenStatus);
  * @access  Private - Requires authentication (hospital admin only)
  */
 router.post('/offline', verifyToken, createOfflineToken);
+
 
 export default router;

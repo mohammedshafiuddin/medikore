@@ -13,7 +13,7 @@ import {
   PastTokensResponse,
   HospitalTodaysTokensResponse,
   DoctorTodaysTokensResponse
-} from "../../shared-types";
+} from "@common_ui/shared-types";
 
 interface SingleDoctorAvailabilityResponse {
   message: string;

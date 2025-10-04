@@ -1,6 +1,6 @@
 import axios from "@/services/axios";
 import { useQuery, useMutation, QueryClient, useQueryClient } from "@tanstack/react-query";
-import type { User, UpcomingAppointment } from "shared-types";
+import type { User, UpcomingAppointment, token_user } from "@common_ui/shared-types";
 
 
 export interface CreateUserPayload {
@@ -46,7 +46,7 @@ export interface UpdateUserProfilePayload {
   profilePicUrl?: string;
 }
 
-import { DoctorDetails } from "shared-types";
+import { DoctorDetails } from "@common_ui/shared-types";
 
 export function useGetUserById(userId: number | string | undefined | null) {
   
@@ -187,4 +187,15 @@ export function useAddPushToken() {
       return res.data;
     },
   });
+}
+
+export function useSearchUserByMobile(mobile: string) {
+  return useQuery<token_user[]>(({
+    queryKey: ['users', 'search', mobile],
+    enabled: !!mobile && mobile.length >= 10,
+    queryFn: async () => {
+      const res = await axios.get<{ users: token_user[] }>(`/users/search?mobile=${mobile}`);
+      return res.data.users;
+    },
+  }));
 }

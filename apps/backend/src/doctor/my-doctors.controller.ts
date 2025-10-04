@@ -7,11 +7,12 @@ import {
   hospitalEmployeesTable,
   doctorSecretariesTable,
   specializationsTable,
+  mobileNumbersTable,
 } from "../db/schema.js";
 import { eq, and, sql, inArray } from "drizzle-orm";
 import { ApiError } from "../lib/api-error.js";
 import { DESIGNATIONS } from "../lib/const-strings.js";
-import { Doctor } from "shared-types";
+import { Doctor } from "@commonTypes";
 
 /**
  * Get doctors based on user's responsibilities:
@@ -24,7 +25,6 @@ export const getMyDoctors = async (
   res: Response,
   next: NextFunction
 ) => {
-  try {
     const userId = req.user?.userId;
     
 
@@ -43,6 +43,7 @@ export const getMyDoctors = async (
     
     let doctors: Doctor[] = [];
 
+    
     if (hospitalAdmin) {
       // User is a hospital admin, get all doctors in their hospital
       doctors = await db
@@ -51,7 +52,7 @@ export const getMyDoctors = async (
           name: usersTable.name,
           username: usersTable.username,
           email: usersTable.email,
-          mobile: usersTable.mobile,
+          // mobile: mobileNumbersTable.mobile,
           doctorInfo: {
             id: doctorInfoTable.id,
             qualifications: doctorInfoTable.qualifications,
@@ -74,11 +75,13 @@ export const getMyDoctors = async (
         })
         .from(usersTable)
         .innerJoin(doctorInfoTable, eq(doctorInfoTable.userId, usersTable.id))
+        .leftJoin(mobileNumbersTable, eq(mobileNumbersTable.id, usersTable.mobileId))
         .innerJoin(
           hospitalEmployeesTable,
           eq(hospitalEmployeesTable.userId, usersTable.id)
         )
         .where(eq(hospitalEmployeesTable.hospitalId, hospitalAdmin.hospitalId));
+      
     } else {
       // Check if the user is a secretary for any doctors
       const secretaryFor = await db
@@ -96,7 +99,7 @@ export const getMyDoctors = async (
             name: usersTable.name,
             username: usersTable.username,
             email: usersTable.email,
-            mobile: usersTable.mobile,
+            mobile: mobileNumbersTable.mobile,
             qualifications: doctorInfoTable.qualifications,
             doctorInfo: {
               id: doctorInfoTable.id,
@@ -119,20 +122,13 @@ export const getMyDoctors = async (
           })
           .from(usersTable)
           .innerJoin(doctorInfoTable, eq(doctorInfoTable.userId, usersTable.id))
+          .innerJoin(mobileNumbersTable, eq(mobileNumbersTable.id, usersTable.mobileId))
           .where(inArray(usersTable.id, doctorIds));
       }
     }
     
 
     return res.status(200).json(doctors);
-  } catch (error) {
-    console.error("Error fetching my doctors:", error);
-    next(
-      error instanceof ApiError
-        ? error
-        : new ApiError("Failed to fetch doctors", 500)
-    );
-  }
 };
 
 

@@ -13,7 +13,7 @@ import {
   PastTokensResponse,
   HospitalTodaysTokensResponse,
   DoctorTodaysTokensResponse
-} from "../../shared-types";
+} from "@common_ui/shared-types";
 
 interface SingleDoctorAvailabilityResponse {
   message: string;
@@ -232,5 +232,17 @@ export function useCreateOfflineToken() {
       queryClient.invalidateQueries({ queryKey: ['hospital-todays-tokens'] });
       queryClient.invalidateQueries({ queryKey: ['doctor-tokens', variables.doctorId] });
     }
+  });
+}
+
+/**
+ * Hook to create a new local token
+ */
+export function useCreateLocalToken() {
+  return useMutation({
+    mutationFn: async (payload: any) => {
+      const res = await axios.post('/tokens/local-token', payload);
+      return res.data;
+    },
   });
 }

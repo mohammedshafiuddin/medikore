@@ -1,28 +1,469 @@
-import React from 'react';
-import { View, ScrollView } from 'react-native';
-import { MyText } from "@common_ui";
-import { tw } from "@common_ui";
-import { ThemedView } from '@/components/ThemedView';
-import AppContainer from '@/components/app-container';
+import React, { useState, useEffect, useCallback } from "react";
+import { View, ScrollView, ActivityIndicator } from "react-native";
+import { MyText, tw, CustomDropdown, MyTextInput, MyButton } from "@common_ui";
+import { ThemedView } from "@/components/ThemedView";
+import AppContainer from "@/components/app-container";
+import { useGetMyDoctors } from "@/api-hooks/my-doctors.api";
+import { useSearchUserByMobile } from "@/api-hooks/user.api";
+import {
+  useGetDoctorAvailabilityForNextDays,
+  useCreateLocalToken,
+} from "@/api-hooks/token.api";
+import { Ionicons } from "@expo/vector-icons";
+import { Formik } from "formik";
+import { GENDERS } from "@common_ui/src/lib/constants";
+import { token_user } from "@common_ui/shared-types";
+import { Chip } from "react-native-paper";
+
+// The form to show after a patient is selected or "add new" is clicked
+const PatientForm = ({
+  patient,
+  mobile,
+  onSubmit,
+}: {
+  patient: token_user | null;
+  mobile: string;
+  onSubmit: (values: any) => void;
+}) => {
+  const handleSubmit = (values: any) => {
+    console.log({values})
+    
+    onSubmit(values);
+  }
+  
+  return (
+    <Formik
+      initialValues={{
+        mobileNumber: mobile,
+        patientName: patient?.name || "",
+        age: patient?.age?.toString() || "",
+        gender: patient?.gender || GENDERS[0],
+        reason: "",
+      }}
+      onSubmit={handleSubmit}
+      enableReinitialize
+    >
+      {({ handleChange, handleBlur, handleSubmit, values, setFieldValue }) => (
+        <View style={tw`mt-6`}>
+          <MyText style={tw`text-lg font-bold mb-4`}>
+            {patient ? "Confirm Patient Details" : "New Patient Details"}
+          </MyText>
+          <MyTextInput
+            placeholder="Patient Name"
+            onChangeText={handleChange("patientName")}
+            value={values.patientName}
+            editable={!patient}
+          />
+          <MyTextInput
+            placeholder="Age"
+            onChangeText={handleChange("age")}
+            value={values.age}
+            keyboardType="number-pad"
+            editable={!patient}
+            style={tw`mt-4`}
+          />
+          <View style={tw`mt-4`}>
+            <CustomDropdown
+              label="Gender"
+              options={GENDERS.map((g) => ({ label: g, value: g }))}
+              onValueChange={(value) => setFieldValue("gender", value)}
+              value={values.gender}
+              disabled={!!patient}
+            />
+          </View>
+          <MyTextInput
+            style={tw`mt-4`}
+            placeholder="Reason for visit (optional)"
+            onChangeText={handleChange("reason")}
+            value={values.reason}
+            multiline
+          />
+          <View style={tw`mt-6`}>
+            <MyButton
+              textContent="Confirm and Proceed"
+              onPress={() => handleSubmit()}
+            />
+          </View>
+        </View>
+      )}
+    </Formik>
+  );
+};
 
 export default function AddTokenScreen() {
+  const {
+    data: doctors,
+    isLoading: doctorsLoading,
+    isError: doctorsError,
+  } = useGetMyDoctors({ enabled: true });
+  const [selectedDoctorId, setSelectedDoctorId] = useState<number | null>(null);
+
+  const {
+    data: availability,
+    isLoading: availabilityLoading,
+    isError: availabilityError,
+  } = useGetDoctorAvailabilityForNextDays(selectedDoctorId || undefined, false);
+
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [showNewPatientForm, setShowNewPatientForm] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState<token_user | null>(
+    null
+  );
+
+  const { data: patients, isLoading: patientsLoading } =
+    useSearchUserByMobile(mobileNumber);
+  const { mutate: createLocalToken } = useCreateLocalToken();
+
+  const handleSelectPatient = (patientId: number | string) => {
+    const patient = patients?.find((p) => p.id === patientId);
+    if (patient) {
+      setSelectedPatient(patient as token_user);
+      setShowNewPatientForm(false); // Hide new patient form if it was open
+    }
+  };
+
+  const handleAddNewPatient = () => {
+    setSelectedPatient(null);
+    setShowNewPatientForm(true);
+  };
+
+  console.log({ selectedDoctorId });
+
+  const handleFormSubmit = useCallback(
+    (values: any) => {
+      // console.log("Form submitted", values);
+      const payload = {
+        ...values,
+        doctorId: selectedDoctorId,
+      };
+      // console.log({payload, selectedDoctorId})
+      console.log({payload})
+      
+      createLocalToken(payload);
+    },
+    [selectedDoctorId, createLocalToken]
+  );
+
+  // Set the first doctor as selected by default when data loads
+  useEffect(() => {
+    if (doctors && doctors.length > 0 && selectedDoctorId === null) {
+      setSelectedDoctorId(doctors[0].id);
+    }
+  }, [doctors, selectedDoctorId]);
+
+  // Transform doctors data into dropdown options
+  const doctorOptions: any[] =
+    doctors?.map((doctor) => ({
+      label: `Dr. ${doctor.name}`,
+      value: doctor.id,
+    })) || [];
+
+  // Handle doctor selection
+  const handleDoctorSelection = (doctorId: string | number) => {
+    setSelectedDoctorId(
+      typeof doctorId === "string" ? parseInt(doctorId) : doctorId
+    );
+  };
+
+  // Loading states
+  if (doctorsLoading) {
+    return (
+      <AppContainer>
+        <View style={tw`flex-1 justify-center items-center`}>
+          <ActivityIndicator size="large" color={tw.color("blue-500")} />
+          <MyText style={tw`mt-4 text-lg`}>Loading doctors...</MyText>
+        </View>
+      </AppContainer>
+    );
+  }
+
+  if (doctorsError) {
+    return (
+      <AppContainer>
+        <View style={tw`flex-1 justify-center items-center p-4`}>
+          <Ionicons
+            name="alert-circle-outline"
+            size={48}
+            color={tw.color("red-500")}
+          />
+          <MyText style={tw`text-red-500 text-center mt-4 text-lg`}>
+            Failed to load doctors. Please try again later.
+          </MyText>
+        </View>
+      </AppContainer>
+    );
+  }
+
+  const renderAvailabilityContent = () => {
+    if (availabilityLoading) {
+      return (
+        <View style={tw`items-center py-8`}>
+          <ActivityIndicator size="large" color={tw.color("blue-500")} />
+          <MyText style={tw`mt-4 text-gray-600`}>
+            Checking availability...
+          </MyText>
+        </View>
+      );
+    }
+    if (availabilityError) {
+      return (
+        <View style={tw`p-4 bg-red-50 rounded-lg`}>
+          <View style={tw`flex-row items-center`}>
+            <Ionicons
+              name="warning-outline"
+              size={20}
+              color={tw.color("red-500")}
+            />
+            <MyText style={tw`text-red-500 font-medium ml-2`}>
+              Error Checking Availability
+            </MyText>
+          </View>
+          <MyText style={tw`text-red-400 mt-2`}>
+            Unable to fetch today's availability. Please try again.
+          </MyText>
+        </View>
+      );
+    }
+
+    if (availability) {
+      const availabilityList = availability.availabilities;
+      const today = new Date().toISOString().split("T")[0];
+
+      const todaysAvailability = availabilityList[0];
+
+      if (!todaysAvailability) {
+        return (
+          <View style={tw`items-center py-6`}>
+            <Ionicons
+              name="calendar-clear-outline"
+              size={48}
+              color={tw.color("gray-400")}
+            />
+            <MyText style={tw`text-gray-500 text-center mt-3`}>
+              No availability information for today
+            </MyText>
+          </View>
+        );
+      }
+
+      const {
+        isPaused,
+        pauseReason,
+        filledTokenCount,
+        totalTokenCount,
+        availableTokens,
+      } = todaysAvailability.availability!;
+      const filledPercentage =
+        totalTokenCount > 0 ? (filledTokenCount / totalTokenCount) * 100 : 0;
+
+      return (
+        <View style={tw`p-1`}>
+          {/* Status and Pause Reason */}
+          <View style={tw`flex-row justify-between items-center mb-4`}>
+            <View style={tw`flex-row items-center`}>
+              <View
+                style={[
+                  tw`w-3 h-3 rounded-full mr-2`,
+                  isPaused ? tw`bg-red-500` : tw`bg-green-500`,
+                ]}
+              />
+              <MyText style={tw`font-bold text-lg`}>
+                {isPaused ? "Paused" : "Available"}
+              </MyText>
+            </View>
+            {isPaused && (
+              <View style={tw`p-2 bg-red-100 rounded-lg`}>
+                <MyText style={tw`text-red-700 text-xs`}>
+                  {pauseReason || "No reason provided"}
+                </MyText>
+              </View>
+            )}
+          </View>
+
+          {/* Token Progress */}
+          <View style={tw`mb-5`}>
+            <View style={tw`flex-row justify-between items-baseline mb-1`}>
+              <MyText style={tw`text-gray-600`}>Tokens Issued</MyText>
+              <MyText style={tw`font-bold text-xl`}>
+                {filledTokenCount}
+                <MyText style={tw`text-gray-500`}>/{totalTokenCount}</MyText>
+              </MyText>
+            </View>
+            <View
+              style={tw`w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700`}
+            >
+              <View
+                style={[
+                  tw`bg-blue-600 h-2.5 rounded-full`,
+                  { width: `${filledPercentage}%` },
+                ]}
+              />
+            </View>
+          </View>
+
+          {/* Key Metrics */}
+          <View style={tw`flex-row justify-around`}>
+            <View style={tw`items-center`}>
+              <MyText style={tw`text-gray-500 text-sm`}>Remaining</MyText>
+              <MyText style={tw`font-bold text-2xl text-green-600`}>
+                {availableTokens}
+              </MyText>
+            </View>
+            <View style={tw`items-center`}>
+              <MyText style={tw`text-gray-500 text-sm`}>Next Slot</MyText>
+              <MyText style={tw`font-bold text-2xl text-orange-500`}>
+                {filledTokenCount < totalTokenCount
+                  ? `#${filledTokenCount + 1}`
+                  : "Full"}
+              </MyText>
+            </View>
+          </View>
+        </View>
+      );
+    }
+
+    return (
+      <View style={tw`items-center py-6`}>
+        <Ionicons
+          name="calendar-clear-outline"
+          size={48}
+          color={tw.color("gray-400")}
+        />
+        <MyText style={tw`text-gray-500 text-center mt-3`}>
+          No availability information for today
+        </MyText>
+      </View>
+    );
+  };
+
   return (
     <AppContainer>
-      <View style={tw`flex-1 p-4`}>
-        <MyText style={tw`text-2xl font-bold mb-6`}>Add Token</MyText>
-        
-        <ThemedView style={tw`p-4 rounded-lg mb-4`}>
-          <MyText style={tw`text-lg mb-2`}>Token Information</MyText>
-          <MyText style={tw`text-base`}>
-            This is the screen where users can add a new token.
+      <View style={tw`flex-1`}>
+        {/* Header */}
+        <View style={tw`bg-blue-600 p-6 rounded-b-3xl mb-6`}>
+          <MyText style={tw`text-2xl font-bold text-white mb-2`}>
+            Add New Token
           </MyText>
-        </ThemedView>
-        
-        <ScrollView style={tw`flex-1`}>
-          {/* Add token form components would go here */}
-          <View style={tw`mb-4 p-4 bg-gray-100 rounded-lg`}>
-            <MyText>Token creation functionality would be implemented here</MyText>
-          </View>
+          <MyText style={tw`text-white text-opacity-90`}>
+            Select a doctor and view their availability
+          </MyText>
+        </View>
+
+        <ScrollView
+          style={tw`flex-1 px-4`}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Doctor Selection Card */}
+          <ThemedView
+            style={tw`p-5 rounded-2xl shadow-md mb-6 border border-gray-200`}
+          >
+            <View style={tw`flex-row items-center mb-4`}>
+              <Ionicons
+                name="person-add-outline"
+                size={24}
+                color={tw.color("blue-600")}
+              />
+              <MyText style={tw`text-xl font-bold ml-2`}>Select Doctor</MyText>
+            </View>
+
+            {doctors && doctors.length > 0 ? (
+              <View style={tw`mb-2`}>
+                <CustomDropdown
+                  label="Available Doctors"
+                  value={selectedDoctorId || ""}
+                  options={doctorOptions}
+                  onValueChange={handleDoctorSelection}
+                  placeholder="Choose a doctor"
+                />
+              </View>
+            ) : (
+              <View style={tw`mb-4 p-4 bg-gray-100 rounded-lg`}>
+                <MyText style={tw`text-center text-gray-600`}>
+                  No doctors available. Please contact your administrator.
+                </MyText>
+              </View>
+            )}
+          </ThemedView>
+
+          {/* Availability Card */}
+          {(availabilityLoading || availability || availabilityError) && (
+            <ThemedView
+              style={tw`p-5 rounded-2xl shadow-md mb-6 border border-gray-200`}
+            >
+              <View style={tw`flex-row items-center mb-4`}>
+                <Ionicons
+                  name="calendar-outline"
+                  size={24}
+                  color={tw.color("blue-600")}
+                />
+                <MyText style={tw`text-xl font-bold ml-2`}>
+                  Today's Availability
+                </MyText>
+              </View>
+              {renderAvailabilityContent()}
+            </ThemedView>
+          )}
+
+          {/* Patient Details Card */}
+          <ThemedView
+            style={tw`p-5 rounded-2xl shadow-md mb-6 border border-gray-200`}
+          >
+            <View style={tw`flex-row items-center mb-4`}>
+              <Ionicons
+                name="person-circle-outline"
+                size={24}
+                color={tw.color("blue-600")}
+              />
+              <MyText style={tw`text-xl font-bold ml-2`}>
+                Patient Details
+              </MyText>
+            </View>
+
+            <MyTextInput
+              placeholder="Enter 10-digit mobile number to search patient"
+              keyboardType="phone-pad"
+              maxLength={10}
+              value={mobileNumber}
+              onChangeText={setMobileNumber}
+            />
+
+            {patientsLoading && <ActivityIndicator style={tw`mt-4`} />}
+
+            {patients && patients.length > 0 && (
+              <View style={tw`mt-4`}>
+                <MyText style={tw`mb-2 text-gray-600`}>
+                  Select from existing patients:
+                </MyText>
+                <View style={tw`flex-row flex-wrap`}>
+                  {patients.map((p) => (
+                    <Chip
+                      key={p.id}
+                      onPress={() => handleSelectPatient(p.id)}
+                      style={tw`mr-2 mb-2`}
+                      selected={selectedPatient?.id === p.id}
+                    >
+                      {`${p.name} (${p.age})`}
+                    </Chip>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            <View style={tw`mt-4`}>
+              <MyButton
+                textContent="Add New Patient"
+                onPress={handleAddNewPatient}
+              />
+            </View>
+
+            {(selectedPatient || showNewPatientForm) && (
+              <PatientForm
+                patient={selectedPatient}
+                mobile={mobileNumber}
+                onSubmit={handleFormSubmit}
+              />
+            )}
+          </ThemedView>
         </ScrollView>
       </View>
     </AppContainer>

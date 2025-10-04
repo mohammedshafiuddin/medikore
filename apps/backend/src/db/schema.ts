@@ -1,11 +1,15 @@
-import { pgTable, integer, varchar, date, unique, boolean, text, timestamp, numeric, json, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, integer, varchar, date, unique, boolean, text, timestamp, numeric, json, jsonb, pgEnum } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 export const mobileNumbersTable = pgTable('mobile_numbers', {
 	id: integer().primaryKey().generatedAlwaysAsIdentity(),
 	mobile: varchar({length: 255}).notNull(),
-	password: varchar({length: 255}).notNull()
+	password: varchar({length: 255})
 })
+
+export const mobileNumbersTableRelations = relations(mobileNumbersTable, ({ many }) => ({
+	users: many(usersTable),
+}));
 
 export const usersTable = pgTable(
 	"users",
@@ -14,13 +18,12 @@ export const usersTable = pgTable(
 		name: varchar({ length: 255 }).notNull(),
 		username: varchar({ length: 255 }),  // Optional, will be null for regular users
 		email: varchar({ length: 255 }),
-		mobile: varchar({ length: 255 }).notNull(),
+		mobileId: integer("mobile_id").references(() => mobileNumbersTable.id),
 		joinDate: date("join_date").notNull().default("now()"),
 		address: varchar({ length: 500 }),
 		profilePicUrl: varchar("profile_pic_url", { length: 255 }),
 	},
 	(t) => ({
-		unq_mobile: unique("unique_mobile").on(t.mobile),
 		unq_email: unique("unique_email").on(t.email),
 		unq_username: unique("unique_username").on(t.username),
 	})
@@ -82,6 +85,10 @@ export const usersTableRelations = relations(usersTable, ({ many, one }) => ({
 	userInfo: one(userInfoTable),
 	doctorSpecializations: many(doctorSpecializationsTable),
 	doctorAvailability: many(doctorAvailabilityTable),
+    mobileNumber: one(mobileNumbersTable, {
+        fields: [usersTable.mobileId],
+        references: [mobileNumbersTable.id],
+    }),
 }));
 
 
@@ -265,13 +272,17 @@ export const tokenInfoRelations = relations(tokenInfoTable, ({ one }) => ({
 	}),
 }));
 
+export const genderEnum = pgEnum('gender', ['Male', 'Female', 'Other']);
+
 export const userInfoTable = pgTable(
 	"user_info",
 	{
 		userId: integer("user_id").notNull().references(() => usersTable.id).primaryKey(),
-		password: varchar("password", { length: 255 }).notNull(),
+		password: varchar("password", { length: 255 }),
 		isSuspended: boolean("is_suspended").notNull().default(false),
 		activeTokenVersion: integer("active_token_version").notNull().default(1),
+		age: integer("age"),
+		gender: genderEnum("gender"),
 	}
 );
 

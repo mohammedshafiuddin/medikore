@@ -10,7 +10,9 @@ import {
   specializationsTable,
   hospitalTable,
   offlineTokensTable,
-  offlineTokensRelations
+  offlineTokensRelations,
+  mobileNumbersTable,
+  userInfoTable
 } from "../db/schema";import { eq, and, sql, desc, gte, inArray } from "drizzle-orm";
 import { ApiError } from "../lib/api-error";
 import { 
@@ -24,7 +26,7 @@ import {
   DoctorTokenSummary,
   DoctorTodaysTokensResponse,
   DoctorTodayToken
-} from "shared-types";
+} from "@commonTypes";
 import { DESIGNATIONS } from "../lib/const-strings";
 
 /**
@@ -1083,4 +1085,101 @@ export const createOfflineToken = async (req: Request, res: Response, next: Next
   } catch (error) {
     next(error);
   }
+};
+
+export const createLocalToken = async (req: Request, res: Response, next: NextFunction) => {
+  
+    const { mobileNumber, patientName, age, gender, reason, doctorId } = req.body;
+
+    // --- Validation ---
+    if (!mobileNumber || !patientName || !doctorId) {
+      throw new ApiError("Missing required fields: mobileNumber, patientName, and doctorId are required", 400);
+    }
+
+    const tokenDate = new Date().toISOString().split('T')[0]; // Token for today
+
+    // --- Main Logic in Transaction ---
+    const result = await db.transaction(async (tx) => {
+      // 1. Find or create user
+      let mobileRecord = await tx.query.mobileNumbersTable.findFirst({
+        where: eq(mobileNumbersTable.mobile, mobileNumber),
+      });
+
+      if (!mobileRecord) {
+        [mobileRecord] = await tx.insert(mobileNumbersTable).values({ mobile: mobileNumber }).returning();
+      }
+
+      let user = await tx.query.usersTable.findFirst({
+        where: and(eq(usersTable.mobileId, mobileRecord.id), eq(usersTable.name, patientName)),
+      });
+
+      if (!user) {
+        [user] = await tx.insert(usersTable).values({
+          name: patientName,
+          mobileId: mobileRecord.id,
+        }).returning();
+
+        await tx.insert(userInfoTable).values({
+          userId: user.id,
+          age: age ? parseInt(age) : null,
+          gender: gender,
+        }).execute();
+      }
+      
+      console.log({user})
+      
+      
+      const userId = user.id;
+
+      // 2. Check doctor availability (similar to bookToken)
+      const availability = await tx.query.doctorAvailabilityTable.findFirst({
+        where: and(
+          eq(doctorAvailabilityTable.doctorId, doctorId),
+          eq(doctorAvailabilityTable.date, tokenDate)
+        )
+      });
+
+      if (!availability) {
+        throw new ApiError("Doctor is not available for booking on this date", 400);
+      }
+      if (availability.isStopped) {
+        throw new ApiError("Doctor is not accepting appointments for this date", 400);
+      }
+      const availableTokens = availability.totalTokenCount - availability.filledTokenCount;
+      if (availableTokens <= 0) {
+        throw new ApiError("No more appointments available for this date", 400);
+      }
+
+      // 3. Create token
+      const nextQueueNumber = availability.filledTokenCount + 1;
+      const [newToken] = await tx.insert(tokenInfoTable).values({
+        doctorId: doctorId,
+        userId: userId,
+        tokenDate: tokenDate,
+        queueNum: nextQueueNumber,
+        description: reason || null,
+        createdAt: new Date().toISOString().split('T')[0],
+        paymentId: 2 // Placeholder for now
+      }).returning();
+
+      // 4. Update doctor availability
+      await tx.update(doctorAvailabilityTable).set({
+        filledTokenCount: availability.filledTokenCount + 1
+      }).where(eq(doctorAvailabilityTable.id, availability.id));
+
+      return {
+        message: "Token booked successfully",
+        token: {
+          id: newToken.id,
+          doctorId: newToken.doctorId,
+          userId: newToken.userId,
+          tokenDate: newToken.tokenDate,
+          queueNumber: newToken.queueNum,
+          description: newToken.description,
+          createdAt: newToken.createdAt
+        }
+      };
+    });
+
+    return res.status(201).json(result);
 };

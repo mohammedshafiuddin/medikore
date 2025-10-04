@@ -13,9 +13,10 @@ import {
   tokenInfoTable,
   notifCredsTable,
   doctorAvailabilityTable,
+  mobileNumbersTable,
 } from "../db/schema";
 import bcrypt from "bcryptjs";
-import { eq, and, or, inArray, isNotNull, ne, gte, sql } from "drizzle-orm";
+import { eq, and, or, inArray, isNotNull, ne, gte, sql, like } from "drizzle-orm";
 import { ApiError } from "../lib/api-error";
 import jwt from "jsonwebtoken";
 import roleManager, { ROLE_NAMES, defaultRole } from "../lib/roles-manager";
@@ -1342,4 +1343,35 @@ export const addPushToken = async (req: Request, res: Response) => {
   //   await db.insert(notifCredsTable).values({ userId: currUser.id, pushToken });
   // }
   res.json({ message: "Push token saved successfully" });
+};
+
+/**
+ * Search for users by mobile number
+ */
+export const searchUsersByMobile = async (req: Request, res: Response, next: NextFunction) => {
+    const { mobile } = req.query;
+
+    if (!mobile) {
+      throw new ApiError("Mobile number is required for search", 400);
+    }
+
+    const mobileQuery = mobile as string;
+    console.log({mobileQuery})
+    
+
+    const users = await db
+      .select({
+        id: usersTable.id,
+        name: usersTable.name,
+        email: usersTable.email,
+        mobile: mobileNumbersTable.mobile,
+        age: userInfoTable.age,
+        gender: userInfoTable.gender,
+      })
+      .from(usersTable)
+      .leftJoin(userInfoTable, eq(usersTable.id, userInfoTable.userId))
+      .leftJoin(mobileNumbersTable, eq(usersTable.mobileId, mobileNumbersTable.id))
+      .where(eq(mobileNumbersTable.mobile, mobileQuery));
+
+    return res.status(200).json({ users: users });
 };

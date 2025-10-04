@@ -119,6 +119,25 @@ function _layout(props: Props) {
           }}
         />
         <Drawer.Screen
+          name="add-token"
+          options={{
+            title: "Add Token",
+            headerShown: true, // Show header only for dashboard root
+            drawerIcon: ({
+              focused,
+            }: {
+              focused: boolean;
+              color: string;
+            }) => (
+              <Ionicons
+                color={focused ? theme.colors.blue1 : theme.colors.gray1}
+                name="add-circle-outline"
+                size={24}
+              />
+            ),
+          }}
+        />
+        <Drawer.Screen
           name="my-hospital"
           options={{
             title: "My Hospital",
@@ -195,7 +214,7 @@ function _layout(props: Props) {
               color: string;
             }) => (
               <Ionicons
-                //   color={focused ? theme.colors.blue1 : theme.colors.gray1}
+                color={focused ? theme.colors.blue1 : theme.colors.gray1}
                 name="settings-outline"
                 size={24}
               />
@@ -421,11 +440,17 @@ function CustomDrawerContent(props: any) {
                   focused={isFocused}
                   activeBackgroundColor={theme.colors.blue3}
                   inactiveBackgroundColor={theme.colors.white1}
-                  icon={({ color, focused, size }) => (
-                    <View style={{ marginRight: 12 }}>
-                      {options.drawerIcon({ color, focused, size })}
-                    </View>
-                  )}
+                  icon={({ color, focused, size }) => {
+                    if (!options.drawerIcon) return undefined;
+                    return (
+                      <View style={{ marginRight: 12 }}>
+                        {typeof options.drawerIcon === 'function' 
+                          ? options.drawerIcon({ color, focused, size })
+                          : options.drawerIcon
+                        }
+                      </View>
+                    );
+                  }}
                   style={{
                     borderRadius: 8,
                     marginHorizontal: 8,
