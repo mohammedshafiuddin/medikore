@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { View, Alert, TextInput } from 'react-native';
-import { MyText } from '@common_ui';
-import { DoctorTodayToken } from 'shared-types';
-import tw from '@/app/tailwind';
-import { Ionicons } from '@expo/vector-icons';
-import { useUpdateTokenStatus } from '@/api-hooks/token.api';
-import { LinearGradient } from 'expo-linear-gradient';
+import React, { useState } from "react";
+import { View, Alert, TextInput } from "react-native";
+import { MyText } from "@common_ui";
+import { DoctorTodayToken } from "shared-types";
+import tw from "@/app/tailwind";
+import { Ionicons } from "@expo/vector-icons";
+import { useUpdateTokenStatus } from "@/api-hooks/token.api";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface DoctorTokenCardProps {
   token: DoctorTodayToken;
@@ -13,55 +13,68 @@ interface DoctorTokenCardProps {
   onAddNotes?: (tokenId: number, notes: string) => void;
 }
 
-const DoctorTokenCard: React.FC<DoctorTokenCardProps> = ({ token, onMarkNoShow, onAddNotes }) => {
+const DoctorTokenCard: React.FC<DoctorTokenCardProps> = ({
+  token,
+  onMarkNoShow,
+  onAddNotes,
+}) => {
   // Get color based on status
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'COMPLETED': return 'bg-green-100 text-green-800';
-      case 'IN_PROGRESS': return 'bg-orange-100 text-orange-800';
-      case 'UPCOMING': return 'bg-blue-100 text-blue-800';
-      case 'MISSED': return 'bg-red-100 text-red-800';
-      case 'CANCELLED': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "COMPLETED":
+        return "bg-green-100 text-green-800";
+      case "IN_PROGRESS":
+        return "bg-orange-100 text-orange-800";
+      case "UPCOMING":
+        return "bg-blue-100 text-blue-800";
+      case "MISSED":
+        return "bg-red-100 text-red-800";
+      case "CANCELLED":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
-  const statusColorClass = getStatusColor(token.status ?? '');
+  const statusColorClass = getStatusColor(token.status ?? "");
 
   // Check for special indicators
-  const isPriority = token.description?.toLowerCase().includes('urgent') || 
-                    token.description?.toLowerCase().includes('emergency') ||
-                    token.description?.toLowerCase().includes('asap');
-  
-  const isFollowUp = token.description?.toLowerCase().includes('follow-up') || 
-                     token.description?.toLowerCase().includes('follow up') ||
-                     token.description?.toLowerCase().includes('followup');
+  const isPriority =
+    token.description?.toLowerCase().includes("urgent") ||
+    token.description?.toLowerCase().includes("emergency") ||
+    token.description?.toLowerCase().includes("asap");
+
+  const isFollowUp =
+    token.description?.toLowerCase().includes("follow-up") ||
+    token.description?.toLowerCase().includes("follow up") ||
+    token.description?.toLowerCase().includes("followup");
 
   // State for notes input
   const [showNotesInput, setShowNotesInput] = useState(false);
-  const [notesInput, setNotesInput] = useState(token.consultationNotes || '');
-  
+  const [notesInput, setNotesInput] = useState(token.consultationNotes || "");
+
   // Use the update token status hook
   const { mutate: updateTokenStatus } = useUpdateTokenStatus();
 
   // Handle marking as no show
   const handleMarkNoShow = () => {
-    Alert.alert(
-      'Mark as No Show',
-      'Are you sure you want to mark this patient as no show?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Confirm', 
-          onPress: () => {
-            updateTokenStatus({ 
-              tokenId: token.id, 
-              status: 'MISSED'
-            });
-          }
-        }
-      ]
-    );
+    updateTokenStatus({
+      tokenId: token.id,
+      status: "MISSED",
+    });
+    // Alert.alert(
+    //   'Mark as No Show',
+    //   'Are you sure you want to mark this patient as no show?',
+    //   [
+    //     { text: 'Cancel', style: 'cancel' },
+    //     {
+    //       text: 'Confirm',
+    //       onPress: () => {
+
+    //       }
+    //     }
+    //   ]
+    // );
   };
 
   // Handle adding notes
@@ -71,63 +84,84 @@ const DoctorTokenCard: React.FC<DoctorTokenCardProps> = ({ token, onMarkNoShow, 
 
   // Save notes
   const saveNotes = () => {
-    updateTokenStatus({ 
-      tokenId: token.id, 
-      consultationNotes: notesInput
+    updateTokenStatus({
+      tokenId: token.id,
+      consultationNotes: notesInput,
     });
     setShowNotesInput(false);
   };
 
   // Cancel notes input
   const cancelNotes = () => {
-    setNotesInput(token.consultationNotes || '');
+    setNotesInput(token.consultationNotes || "");
     setShowNotesInput(false);
   };
 
   return (
-    <View style={tw`bg-white p-5 rounded-2xl shadow-lg mb-4 border-l-4 ${
-      token.status === 'COMPLETED' ? 'border-green-500' : 
-      token.status === 'IN_PROGRESS' ? 'border-orange-500' : 
-      token.status === 'UPCOMING' ? 'border-blue-500' : 
-      token.status === 'MISSED' ? 'border-red-500' : 'border-gray-500'
-    }`}>
+    <View
+      style={tw`bg-white p-5 rounded-2xl shadow-lg mb-4 border-l-4 ${
+        token.status === "COMPLETED"
+          ? "border-green-500"
+          : token.status === "IN_PROGRESS"
+          ? "border-orange-500"
+          : token.status === "UPCOMING"
+          ? "border-blue-500"
+          : token.status === "MISSED"
+          ? "border-red-500"
+          : "border-gray-500"
+      }`}
+    >
       <View style={tw`flex-row justify-between items-start mb-3`}>
         <View style={tw`flex-1`}>
           <View style={tw`flex-row items-center`}>
-            <MyText style={tw`text-xl font-bold text-gray-800`}>Token #{token.queueNumber}</MyText>
+            <MyText style={tw`text-xl font-bold text-gray-800`}>
+              Token #{token.queueNumber}
+            </MyText>
             {isPriority && (
-              <LinearGradient 
-                colors={['#ef4444', '#dc2626']} 
+              <LinearGradient
+                colors={["#ef4444", "#dc2626"]}
                 style={tw`ml-3 px-3 py-1 rounded-full flex-row items-center`}
               >
                 <Ionicons name="alert-circle" size={14} color="white" />
-                <MyText style={tw`text-white text-xs font-bold ml-1`}>URGENT</MyText>
+                <MyText style={tw`text-white text-xs font-bold ml-1`}>
+                  URGENT
+                </MyText>
               </LinearGradient>
             )}
             {isFollowUp && (
-              <LinearGradient 
-                colors={['#8b5cf6', '#7c3aed']} 
+              <LinearGradient
+                colors={["#8b5cf6", "#7c3aed"]}
                 style={tw`ml-3 px-3 py-1 rounded-full`}
               >
-                <MyText style={tw`text-white text-xs font-bold`}>FOLLOW-UP</MyText>
+                <MyText style={tw`text-white text-xs font-bold`}>
+                  FOLLOW-UP
+                </MyText>
               </LinearGradient>
             )}
           </View>
-          <MyText style={tw`text-gray-700 font-medium mt-1`}>{token.patientName}</MyText>
-          <MyText style={tw`text-gray-500 text-sm`}>{token.patientMobile}</MyText>
+          <MyText style={tw`text-gray-700 font-medium mt-1`}>
+            {token.patientName}
+          </MyText>
+          <MyText style={tw`text-gray-500 text-sm`}>
+            {token.patientMobile}
+          </MyText>
         </View>
-        <LinearGradient 
+        <LinearGradient
           colors={
-            token.status === 'COMPLETED' ? ['#10b981', '#059669'] :
-            token.status === 'IN_PROGRESS' ? ['#f97316', '#ea580c'] :
-            token.status === 'UPCOMING' ? ['#3b82f6', '#2563eb'] :
-            token.status === 'MISSED' ? ['#ef4444', '#dc2626'] :
-            ['#6b7280', '#4b5563']
-          } 
+            token.status === "COMPLETED"
+              ? ["#10b981", "#059669"]
+              : token.status === "IN_PROGRESS"
+              ? ["#f97316", "#ea580c"]
+              : token.status === "UPCOMING"
+              ? ["#3b82f6", "#2563eb"]
+              : token.status === "MISSED"
+              ? ["#ef4444", "#dc2626"]
+              : ["#6b7280", "#4b5563"]
+          }
           style={tw`px-4 py-2 rounded-full`}
         >
           <MyText style={tw`text-white text-xs font-bold`}>
-            {token.status ?? 'N/A'}
+            {token.status ?? "N/A"}
           </MyText>
         </LinearGradient>
       </View>
@@ -150,16 +184,13 @@ const DoctorTokenCard: React.FC<DoctorTokenCardProps> = ({ token, onMarkNoShow, 
             numberOfLines={3}
           />
           <View style={tw`flex-row justify-end`}>
-            <MyText 
+            <MyText
               style={tw`text-gray-600 mr-6 font-medium`}
               onPress={cancelNotes}
             >
               Cancel
             </MyText>
-            <MyText 
-              style={tw`text-blue-600 font-bold`}
-              onPress={saveNotes}
-            >
+            <MyText style={tw`text-blue-600 font-bold`} onPress={saveNotes}>
               Save Notes
             </MyText>
           </View>
@@ -173,10 +204,10 @@ const DoctorTokenCard: React.FC<DoctorTokenCardProps> = ({ token, onMarkNoShow, 
         </View>
       ) : null}
       {/* Action buttons for doctors */}
-      {token.status === 'UPCOMING' && (
+      {token.status === "UPCOMING" && (
         <View style={tw`flex-row mt-4 pt-4 border-t border-gray-100`}>
           <View style={tw`flex-1`}>
-            <MyText 
+            <MyText
               style={tw`text-red-500 text-center font-bold py-2`}
               onPress={handleMarkNoShow}
             >
@@ -185,7 +216,7 @@ const DoctorTokenCard: React.FC<DoctorTokenCardProps> = ({ token, onMarkNoShow, 
           </View>
           <View style={tw`h-6 w-px bg-gray-200 mx-2 self-center`} />
           <View style={tw`flex-1`}>
-            <MyText 
+            <MyText
               style={tw`text-blue-600 text-center font-bold py-2`}
               onPress={handleAddNotes}
             >
@@ -194,19 +225,21 @@ const DoctorTokenCard: React.FC<DoctorTokenCardProps> = ({ token, onMarkNoShow, 
           </View>
         </View>
       )}
-      {token.status === 'IN_PROGRESS' && (
+      {token.status === "IN_PROGRESS" && (
         <View style={tw`flex-row mt-4 pt-4 border-t border-gray-100`}>
           <View style={tw`flex-1`}>
-            <MyText 
+            <MyText
               style={tw`text-green-600 text-center font-bold py-2`}
-              onPress={() => updateTokenStatus({ tokenId: token.id, status: 'COMPLETED' })}
+              onPress={() =>
+                updateTokenStatus({ tokenId: token.id, status: "COMPLETED" })
+              }
             >
               Mark as Completed
             </MyText>
           </View>
           <View style={tw`h-6 w-px bg-gray-200 mx-2 self-center`} />
           <View style={tw`flex-1`}>
-            <MyText 
+            <MyText
               style={tw`text-blue-600 text-center font-bold py-2`}
               onPress={handleAddNotes}
             >

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Alert, TextInput } from 'react-native';
 import { MyText } from "@common_ui";
-import { DoctorTodayToken } from 'shared-types';
+import { DoctorTodayToken } from '@common_ui/shared-types';
 import { tw } from '@common_ui';
 import { Ionicons } from '@expo/vector-icons';
 import { useUpdateTokenStatus } from '@/api-hooks/token.api';
@@ -46,22 +46,11 @@ const DoctorTokenCard: React.FC<DoctorTokenCardProps> = ({ token, onMarkNoShow, 
 
   // Handle marking as no show
   const handleMarkNoShow = () => {
-    Alert.alert(
-      'Mark as No Show',
-      'Are you sure you want to mark this patient as no show?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Confirm', 
-          onPress: () => {
-            updateTokenStatus({ 
-              tokenId: token.id, 
-              status: 'MISSED'
-            });
-          }
-        }
-      ]
-    );
+    console.log('Mark as No Show pressed for token:', token.id);
+    updateTokenStatus({ 
+      tokenId: token.id, 
+      status: 'MISSED'
+    });
   };
 
   // Handle adding notes
@@ -172,49 +161,35 @@ const DoctorTokenCard: React.FC<DoctorTokenCardProps> = ({ token, onMarkNoShow, 
           </MyText>
         </View>
       ) : null}
-      {/* Action buttons for doctors */}
-      {token.status === 'UPCOMING' && (
-        <View style={tw`flex-row mt-4 pt-4 border-t border-gray-100`}>
-          <View style={tw`flex-1`}>
-            <MyText 
-              style={tw`text-red-500 text-center font-bold py-2`}
-              onPress={handleMarkNoShow}
-            >
-              Mark as No Show
-            </MyText>
-          </View>
-          <View style={tw`h-6 w-px bg-gray-200 mx-2 self-center`} />
-          <View style={tw`flex-1`}>
-            <MyText 
-              style={tw`text-blue-600 text-center font-bold py-2`}
-              onPress={handleAddNotes}
-            >
-              Add Notes
-            </MyText>
-          </View>
+      {/* Action buttons for doctors - available for all statuses */}
+      <View style={tw`flex-row mt-4 pt-4 border-t border-gray-100`}>
+        <View style={tw`flex-1`}>
+          <MyText 
+            style={tw`text-green-600 text-center font-bold py-2`}
+            onPress={() => updateTokenStatus({ tokenId: token.id, status: 'COMPLETED' })}
+          >
+            Mark as Completed
+          </MyText>
         </View>
-      )}
-      {token.status === 'IN_PROGRESS' && (
-        <View style={tw`flex-row mt-4 pt-4 border-t border-gray-100`}>
-          <View style={tw`flex-1`}>
-            <MyText 
-              style={tw`text-green-600 text-center font-bold py-2`}
-              onPress={() => updateTokenStatus({ tokenId: token.id, status: 'COMPLETED' })}
-            >
-              Mark as Completed
-            </MyText>
-          </View>
-          <View style={tw`h-6 w-px bg-gray-200 mx-2 self-center`} />
-          <View style={tw`flex-1`}>
-            <MyText 
-              style={tw`text-blue-600 text-center font-bold py-2`}
-              onPress={handleAddNotes}
-            >
-              Add Notes
-            </MyText>
-          </View>
+        <View style={tw`h-6 w-px bg-gray-200 mx-2 self-center`} />
+        <View style={tw`flex-1`}>
+          <MyText 
+            style={tw`text-red-500 text-center font-bold py-2`}
+            onPress={handleMarkNoShow}
+          >
+            Mark as No Show
+          </MyText>
         </View>
-      )}
+        <View style={tw`h-6 w-px bg-gray-200 mx-2 self-center`} />
+        <View style={tw`flex-1`}>
+          <MyText 
+            style={tw`text-blue-600 text-center font-bold py-2`}
+            onPress={handleAddNotes}
+          >
+            Add Notes
+          </MyText>
+        </View>
+      </View>
     </View>
   );
 };

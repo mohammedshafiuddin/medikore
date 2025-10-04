@@ -26,7 +26,8 @@ export interface DoctorTodayToken {
   patientName: string;
   patientMobile: string;
   description: string | null;
-  status?: 'UPCOMING' | 'IN_PROGRESS' | 'COMPLETED' | 'MISSED' | 'CANCELLED'; // Made optional
+  status: 'UPCOMING' | 'IN_PROGRESS' | 'COMPLETED' | 'MISSED' | 'CANCELLED'; // Made optional
+  // status: string; // 'UPCOMING' | 'IN_PROGRESS' | 'COMPLETED' | 'MISSED' | 'CANCELLED'; // Made optional
   consultationNotes?: string | null;
 }
 

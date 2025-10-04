@@ -32,19 +32,23 @@ function MyButton({
   if (variant === "red") backgroundColor = colors.red1;
   if (variant === "green") backgroundColor = colors.green1;
   if (fillColor && colors[fillColor]) backgroundColor = colors[fillColor];
-  let labelColor = "#fff";
-  if (textColor && colors[textColor]) labelColor = colors[textColor];
+  
+  let finalTextColor = "#fff";
+  if (textColor && colors[textColor]) finalTextColor = colors[textColor];
+  
   let borderCol = backgroundColor;
   if (borderColor && colors[borderColor]) borderCol = colors[borderColor];
-  // Default font weight 400 (as string literal)
+
   const labelStyle = {
-    color: labelColor,
+    color: finalTextColor,
     fontWeight: "400" as const,
     ...(props.labelStyle as object),
   };
+
   return (
     <PaperButton
       {...props}
+      textColor={finalTextColor}
       style={[
         {
           backgroundColor,
@@ -53,14 +57,13 @@ function MyButton({
           borderWidth: 1,
           borderColor: borderCol,
           opacity: props.disabled ? 0.7 : 1,
-          // cursor: props.disabled ? "not-allowed" : "pointer",
           ...(fullWidth && { width: "100%" }),
         },
-        props.style && props.style,
+        props.style,
       ]}
       labelStyle={labelStyle}
     >
-      {textContent ? <MyText>{textContent}</MyText> : children}
+      {textContent ? <MyText style={{ color: finalTextColor }}>{textContent}</MyText> : children}
     </PaperButton>
   );
 }

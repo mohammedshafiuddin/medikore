@@ -201,5 +201,15 @@ export interface DoctorAvailabilityPayload {
   consultationsDone?: number;
 }
 
+
+export interface token_user {
+  id: number;
+  name: string;
+  mobile: string;
+  age: number;
+  gender: string;
+}
+
+
 // Export the types from token-types.ts
 export * from './token-types';

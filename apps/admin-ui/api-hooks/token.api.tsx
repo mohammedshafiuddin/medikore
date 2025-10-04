@@ -197,8 +197,15 @@ export function useUpdateTokenStatus() {
   
   return useMutation({
     mutationFn: async ({ tokenId, status, consultationNotes }: { tokenId: number, status?: string, consultationNotes?: string }) => {
-      const response = await axios.patch(`/tokens/${tokenId}/status`, { status, consultationNotes });
-      return response.data;
+      console.log('Making API call to update token status:', { tokenId, status, consultationNotes });
+      try {
+        const response = await axios.patch(`/tokens/${tokenId}/status`, { status, consultationNotes });
+        console.log('Token status update response:', response.data);
+        return response.data;
+      } catch (error) {
+        console.error('Error in API call to update token status:', error);
+        throw error;
+      }
     },
     onSuccess: (_, variables) => {
       // Invalidate and refetch relevant queries
@@ -206,6 +213,9 @@ export function useUpdateTokenStatus() {
       queryClient.invalidateQueries({ queryKey: ['hospital-todays-tokens'] });
       queryClient.invalidateQueries({ queryKey: ['my-upcoming-tokens'] });
       queryClient.invalidateQueries({ queryKey: ['my-past-tokens'] });
+    },
+    onError: (error) => {
+      console.error('Error updating token status:', error);
     }
   });
 }

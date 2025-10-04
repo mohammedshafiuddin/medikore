@@ -7,7 +7,7 @@ import { getJWT } from '@/hooks/useJWT'
 import tw from '@/app/tailwind';
 import { ThemedView } from '@/components/ThemedView';
 import { useRouter } from 'expo-router';
-import { DoctorTokenSummary, DoctorTodayToken } from 'shared-types';
+import { DoctorTokenSummary, DoctorTodayToken } from '@common_ui/shared-types';
 import { Ionicons } from '@expo/vector-icons';
 import { ErrorToast } from '@/services/toaster';
 import DoctorTokenCard from './DoctorTokenCard';
@@ -226,57 +226,6 @@ function Index(props: Props) {
     )
 }
 
-// Doctor Summary Card Component
-interface DoctorSummaryCardProps {
-    doctor: DoctorTokenSummary;
-    onPress: () => void;
-}
 
-const DoctorSummaryCard: React.FC<DoctorSummaryCardProps> = ({ doctor, onPress }) => {
-    return (
-        <TouchableOpacity 
-            style={tw`bg-white p-4 rounded-xl shadow-sm mb-4 border-l-4 border-blue-500`}
-            onPress={onPress}
-        >
-            <View style={tw`flex-row justify-between items-start mb-2`}>
-                <View style={tw`flex-1`}>
-                    <MyText style={tw`text-lg font-bold`}>{doctor.name}</MyText>
-                    {doctor.specializations && doctor.specializations.length > 0 && (
-                        <MyText style={tw`text-gray-600 text-sm`}>
-                            {doctor.specializations.join(', ')}
-                        </MyText>
-                    )}
-                </View>
-                {doctor.currentTokenNumber && (
-                    <View style={tw`bg-blue-100 px-3 py-1 rounded-full`}>
-                        <MyText style={tw`text-blue-800 text-xs font-medium`}>
-                            Current: #{doctor.currentTokenNumber}
-                        </MyText>
-                    </View>
-                )}
-            </View>
-            
-            {/* Token statistics */}
-            <View style={tw`flex-row justify-between mt-3`}>
-                <View style={tw`items-center`}>
-                    <MyText style={tw`text-gray-500 text-xs`}>Total</MyText>
-                    <MyText style={tw`text-blue-600 font-bold`}>{doctor.totalTokens}</MyText>
-                </View>
-                <View style={tw`items-center`}>
-                    <MyText style={tw`text-gray-500 text-xs`}>Completed</MyText>
-                    <MyText style={tw`text-green-600 font-bold`}>{doctor.completedTokens}</MyText>
-                </View>
-                <View style={tw`items-center`}>
-                    <MyText style={tw`text-gray-500 text-xs`}>In Progress</MyText>
-                    <MyText style={tw`text-orange-500 font-bold`}>{doctor.inProgressTokens}</MyText>
-                </View>
-                <View style={tw`items-center`}>
-                    <MyText style={tw`text-gray-500 text-xs`}>Upcoming</MyText>
-                    <MyText style={tw`text-indigo-600 font-bold`}>{doctor.upcomingTokens}</MyText>
-                </View>
-            </View>
-        </TouchableOpacity>
-    );
-};
 
 export default Index

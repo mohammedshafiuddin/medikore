@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ErrorToast } from '@/services/toaster';
 import DoctorTokenCard from './DoctorTokenCard';
 import { LinearGradient } from 'expo-linear-gradient';
+import TabNavigation from '@/components/TabNavigation';
 
 interface Props {}
 
@@ -21,6 +22,16 @@ function Index(props: Props) {
     const router = useRouter();
     const [selectedDoctorId, setSelectedDoctorId] = useState<number | null>(null);
     const [refreshing, setRefreshing] = useState(false);
+    // Define tab configuration
+    const TABS = {
+        UPCOMING: 'UPCOMING',
+        COMPLETED: 'COMPLETED',
+        NO_SHOW: 'NO_SHOW'
+    } as const;
+    
+    type TabType = keyof typeof TABS;
+    
+    const [activeTab, setActiveTab] = useState<TabType>('UPCOMING');
     
     // Using the hospital today API to fetch top tokens of doctors
     const { 
@@ -74,6 +85,21 @@ function Index(props: Props) {
         setSelectedDoctorId(doctorId);
     };
 
+    // Filter tokens based on the active tab
+    const filterTokensByStatus = (tokens: DoctorTodayToken[] | undefined) => {
+        if (!tokens) return [];
+        
+        return tokens.filter(token => {
+            if (activeTab === TABS.UPCOMING) {
+                return token.status === 'UPCOMING' || token.status === 'IN_PROGRESS';
+            } else if (activeTab === TABS.COMPLETED) {
+                return token.status === 'COMPLETED';
+            } else { // NO_SHOW
+                return token.status === 'MISSED';
+            }
+        });
+    };
+
     return (
         <AppContainer>
             <ScrollView
@@ -104,6 +130,17 @@ function Index(props: Props) {
                                   {doctorTokensData?.date ? formatDate(doctorTokensData.date) : 'Today'}
                               </MyText>
                             </LinearGradient>
+                            
+                            {/* Tab navigation for doctor's tokens */}
+                            <TabNavigation
+                                tabs={[
+                                    { key: TABS.UPCOMING, title: 'Upcoming' },
+                                    { key: TABS.COMPLETED, title: 'Completed' },
+                                    { key: TABS.NO_SHOW, title: 'No Show' }
+                                ]}
+                                activeTab={activeTab}
+                                onTabChange={(tab) => setActiveTab(tab as TabType)}
+                            />
                         </View>
                     ) : (
                         <LinearGradient 
@@ -151,7 +188,7 @@ function Index(props: Props) {
                         // Doctor detail view
                         <View>
                             {/* Current token indicator */}
-                            {doctorTokensData?.currentTokenNumber && (
+                            {doctorTokensData?.currentTokenNumber && activeTab === 'UPCOMING' && (
                                 <LinearGradient 
                                   colors={['#3b82f6', '#2563eb']} 
                                   style={tw`p-4 rounded-2xl shadow-lg mb-6 flex-row justify-between items-center`}
@@ -174,7 +211,7 @@ function Index(props: Props) {
                             
                             {/* Doctor's tokens list */}
                             {doctorTokensData?.tokens && doctorTokensData.tokens.length > 0 ? (
-                                doctorTokensData.tokens.map((token) => (
+                                filterTokensByStatus(doctorTokensData.tokens).map((token) => (
                                     <DoctorTokenCard key={token.id} token={token} />
                                 ))
                             ) : (

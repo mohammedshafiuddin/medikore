@@ -4,7 +4,7 @@ import { View, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-nat
 import { AppContainer } from '@common_ui';
 import { MyText } from '@common_ui';
 import { useDoctorTodaysTokens } from '@/api-hooks/token.api';
-import { DoctorTodayToken } from 'shared-types';
+import { DoctorTodayToken } from '@common_ui/shared-types';
 import tw from '@/app/tailwind';
 import { Ionicons } from '@expo/vector-icons';
 import DoctorTokenCard from './DoctorTokenCard';

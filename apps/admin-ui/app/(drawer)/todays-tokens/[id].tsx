@@ -1,21 +1,47 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { View, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import AppContainer from '@/components/app-container';
 import { MyText } from "@common_ui";
 import { useDoctorTodaysTokens } from '@/api-hooks/token.api';
-import { DoctorTodayToken } from 'shared-types';
+import { DoctorTodayToken } from '@common_ui/shared-types';
 import { tw } from '@common_ui';
 import { Ionicons } from '@expo/vector-icons';
 import DoctorTokenCard from './DoctorTokenCard';
 import { LinearGradient } from 'expo-linear-gradient';
+import TabNavigation from '@/components/TabNavigation';
 
 export default function DoctorTokensPage() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const doctorId = typeof id === 'string' ? parseInt(id) : 0;
+  // Define tab configuration
+  const TABS = {
+    UPCOMING: 'UPCOMING',
+    COMPLETED: 'COMPLETED',
+    NO_SHOW: 'NO_SHOW'
+  } as const;
+  
+  type TabType = keyof typeof TABS;
+  
+  const [activeTab, setActiveTab] = useState<TabType>('UPCOMING');
 
   const { data, isLoading, isError, error, refetch } = useDoctorTodaysTokens(doctorId);
+
+  // Filter tokens based on the active tab
+  const filterTokensByStatus = (tokens: DoctorTodayToken[] | undefined) => {
+    if (!tokens) return [];
+    
+    return tokens.filter(token => {
+      if (activeTab === TABS.UPCOMING) {
+        return token.status === 'UPCOMING' || token.status === 'IN_PROGRESS';
+      } else if (activeTab === TABS.COMPLETED) {
+        return token.status === 'COMPLETED';
+      } else { // NO_SHOW
+        return token.status === 'MISSED';
+      }
+    });
+  };
 
   return (
     <AppContainer>
@@ -33,6 +59,17 @@ export default function DoctorTokensPage() {
             </MyText>
           </LinearGradient>
 
+          {/* Tab navigation for doctor's tokens */}
+          <TabNavigation
+            tabs={[
+              { key: TABS.UPCOMING, title: 'Upcoming' },
+              { key: TABS.COMPLETED, title: 'Completed' },
+              { key: TABS.NO_SHOW, title: 'No Show' }
+            ]}
+            activeTab={activeTab}
+            onTabChange={(tab) => setActiveTab(tab as TabType)}
+          />
+
           {isLoading ? (
             <View style={tw`items-center justify-center py-12`}>
               <ActivityIndicator size="large" color="#4361ee" />
@@ -48,7 +85,7 @@ export default function DoctorTokensPage() {
               </TouchableOpacity>
             </View>
           ) : data?.tokens && data.tokens.length > 0 ? (
-            data.tokens.map((token: DoctorTodayToken) => (
+            filterTokensByStatus(data.tokens).map((token: DoctorTodayToken) => (
               <DoctorTokenCard key={token.id} token={token} />
             ))
           ) : (
