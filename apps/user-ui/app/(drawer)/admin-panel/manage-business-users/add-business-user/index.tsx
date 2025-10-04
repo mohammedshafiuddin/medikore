@@ -1,11 +1,11 @@
-import MyText from "@/components/text";
+import { MyText } from "@common_ui";
 import React from "react";
 import { ScrollView, View } from "react-native";
 import tw from "@/app/tailwind";
 import { useRouter } from "expo-router";
 import AddBusinessUserForm from "@/components/add-business-user-form";
 import { MaterialIcons } from "@expo/vector-icons";
-import AppContainer from "@/components/app-container";
+import { AppContainer } from "@common_ui";
 
 function AddBusinessUser() {
   const router = useRouter();

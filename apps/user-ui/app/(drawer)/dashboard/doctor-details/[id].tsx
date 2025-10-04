@@ -3,13 +3,12 @@ import { View, ActivityIndicator, ScrollView } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import tw from '@/app/tailwind';
 import { ThemedView } from '@/components/ThemedView';
-import MyText from '@/components/text';
+import { MyText } from '@common_ui';
 import { useRouter } from 'expo-router';
 import useHideDrawerHeader from '@/hooks/useHideDrawerHeader';
 import { useRoles } from '@/components/context/roles-context';
 import { ROLE_NAMES } from '@/lib/constants';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import UserDetailsAdminPov from '@/components/user-details-admin-pov';
 import UserDetailsUserPov from '@/components/user-details-user-pov';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -58,10 +57,5 @@ export default function DoctorDetailsScreen() {
     );
   }
 
-  // Determine which component to render based on user role
-  if (isAdmin || isHospitalAdmin) {
-    return <UserDetailsAdminPov doctorId={doctorId} />;
-  } else {
     return <UserDetailsUserPov doctorId={doctorId} />;
-  }
 }

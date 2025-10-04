@@ -6,7 +6,9 @@
       "@/*": [
         "./*"
       ],
-      "shared-types": ["../shared-types"]
+      "shared-types": ["../shared-types"],
+      "@common_ui": ["../../packages/ui"],
+      "@common_ui/*": ["../../packages/ui/*"]
     }
   },
   "include": [

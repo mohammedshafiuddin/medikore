@@ -1,8 +1,8 @@
 import React from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { View, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
-import AppContainer from '@/components/app-container';
-import MyText from '@/components/text';
+import { AppContainer } from '@common_ui';
+import { MyText } from '@common_ui';
 import { useDoctorTodaysTokens } from '@/api-hooks/token.api';
 import { DoctorTodayToken } from 'shared-types';
 import tw from '@/app/tailwind';

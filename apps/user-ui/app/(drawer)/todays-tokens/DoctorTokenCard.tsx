@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Alert, TextInput } from 'react-native';
-import MyText from '@/components/text';
+import { MyText } from '@common_ui';
 import { DoctorTodayToken } from 'shared-types';
 import tw from '@/app/tailwind';
 import { Ionicons } from '@expo/vector-icons';

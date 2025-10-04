@@ -1,5 +1,5 @@
-import AppContainer from '@/components/app-container'
-import MyText from '@/components/text'
+import { AppContainer } from '@common_ui'
+import { MyText } from '@common_ui'
 import React, { useState } from 'react'
 import { View, ScrollView, ActivityIndicator, TouchableOpacity, RefreshControl } from 'react-native';
 import { useHospitalTodaysTokens, useDoctorTodaysTokens } from '@/api-hooks/token.api'

@@ -22,7 +22,7 @@ import {
 } from "@/api-hooks/token.api";
 import { useGetUserById, useUpdateBusinessUser } from "@/api-hooks/user.api";
 import { BottomDialog } from "@common_ui";
-import { User, DashboardDoctor } from "shared-types";
+import { User, DashboardDoctor } from "@common_ui/shared-types";
 import AppContainer from "./app-container";
 import { DatePicker } from "@common_ui";
 import {

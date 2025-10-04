@@ -4,7 +4,7 @@ import { useCurrentUserId } from '@/hooks/useCurrentUserId';
 import React, { useState } from 'react';
 import { View, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import MyText from '@/components/text';
+import { MyText } from '@common_ui';
 import tw from '@/app/tailwind';
 import { useRouter } from 'expo-router';
 import { useRoles } from '@/components/context/roles-context';

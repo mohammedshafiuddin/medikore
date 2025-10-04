@@ -3,10 +3,10 @@ import { ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import tw from '@/app/tailwind';
 import { ThemedView } from '@/components/ThemedView';
-import MyText from '@/components/text';
+import { MyText } from '@common_ui';
 import useHideDrawerHeader from '@/hooks/useHideDrawerHeader';
 import { useAuth } from '@/components/context/auth-context';
-import AppContainer from '@/components/app-container';
+import { AppContainer } from '@common_ui';
 import HospitalForm, { initialHospitalValues } from '@/components/hospital-form';
 
 export default function EditHospitalScreen() {

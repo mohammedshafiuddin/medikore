@@ -3,13 +3,13 @@ import { View, TouchableOpacity } from "react-native";
 import tw from "@/app/tailwind";
 import AddBusinessUserForm from "@/components/add-business-user-form";
 import { ThemedView } from "@/components/ThemedView";
-import MyText from "@/components/text";
+import { MyText } from "@common_ui";
 import { useGetUserById } from "@/api-hooks/user.api";
 import { ActivityIndicator } from "react-native";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import AppContainer from "@/components/app-container";
+import { AppContainer } from "@common_ui";
 import { ROLE_NAMES } from "@/lib/constants";
 
 interface DoctorEditPageProps {

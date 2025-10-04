@@ -3,14 +3,14 @@ import { View, ScrollView, ActivityIndicator, TouchableOpacity, Image } from 're
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import tw from '@/app/tailwind';
-import MyText from '@/components/text';
+import { MyText } from '@common_ui';
 import HorizontalImageScroller from '@/components/HorizontalImageScroller';
-import MyButton from '@/components/button';
+import { MyButton } from '@common_ui';
 import { ThemedView } from '@/components/ThemedView';
 import { useAuth } from '@/components/context/auth-context';
 import { useGetHospitalById, useHospitalAdminDashboard } from '@/api-hooks/hospital.api';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import AppContainer from '@/components/app-container';
+import { AppContainer } from '@common_ui';
 import { ROLE_NAMES } from '@/lib/constants';
 
 export default function MyHospital() {

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import tw from '@/app/tailwind';
-import MyText from '@/components/text';
+import { MyText } from '@common_ui';
 import { useRoles } from '@/components/context/roles-context';
 import { ROLE_NAMES } from '@/lib/constants';
 import { useAppointmentScreenDoctors } from '@/api-hooks/dashboard.api';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import DoctorCard from '@/components/doctor-card';
-import AppContainer from '@/components/app-container';
+import { AppContainer } from '@common_ui';
 
 export default function AppointmentsScreen() {
   const roles = useRoles();

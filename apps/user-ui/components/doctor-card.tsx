@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, TouchableOpacity, Image } from 'react-native';
-import MyText from '@/components/text';
+import { MyText } from '@common_ui';
 import tw from '@/app/tailwind';
 import { Ionicons } from '@expo/vector-icons';
 import { AppointmentScreenDoctor } from '@/api-hooks/dashboard.api';

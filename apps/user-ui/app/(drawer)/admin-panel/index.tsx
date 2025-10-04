@@ -1,11 +1,11 @@
-import MyText from "@/components/text";
-import MyButton from "@/components/button";
+import { MyText } from "@common_ui";
+import { MyButton } from "@common_ui";
 import React from "react";
 import { View, Image } from "react-native";
 import tw from "@/app/tailwind";
 import { useRouter } from "expo-router";
 import { MaterialIcons } from '@expo/vector-icons';
-import AppContainer from "@/components/app-container";
+import { AppContainer } from "@common_ui";
 
 interface Props {}
 

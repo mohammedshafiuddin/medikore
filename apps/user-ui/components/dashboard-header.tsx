@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity, Animated, Easing } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import MyText from '@/components/text';
+import { MyText } from '@common_ui';
 import tw from '@/app/tailwind';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '@/hooks/useThemeColor';

@@ -1,11 +1,11 @@
 import {useAddPushToken, useHasPushToken } from "@/api-hooks/user.api";
 import React from "react";
 import { useNotification } from "./notif-context";
-import BottomDialog from "@/components/dialog";
-import MyText from "@/components/text";
+import { BottomDialog } from "@common_ui";
+import { MyText } from "@common_ui";
 import { View, Linking } from "react-native";
 import tw from "@/app/tailwind";
-import MyButton from "@/components/button";
+import { MyButton } from "@common_ui";
 import { useAuth } from "@/components/context/auth-context";
 
 interface Props {}

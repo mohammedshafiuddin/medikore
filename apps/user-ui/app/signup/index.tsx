@@ -1,8 +1,8 @@
-import MyText from "@/components/text";
+import { MyText } from "@common_ui";
 import React from "react";
 import { View, Alert, Image, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import MyTextInput from "@/components/textinput";
-import MyButton from "@/components/button";
+import { MyButton } from "@common_ui";
 import { useTheme } from "@/app/hooks/theme.context";
 import {
   CreateUserPayload,

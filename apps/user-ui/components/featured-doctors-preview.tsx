@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, TouchableOpacity, ActivityIndicator } from 'react-native';
-import MyText from '@/components/text';
+import { MyText } from '@common_ui';
 import tw from '@/app/tailwind';
 import DoctorDetails from '@/components/doctor-details';
 import { ThemedView } from '@/components/ThemedView';

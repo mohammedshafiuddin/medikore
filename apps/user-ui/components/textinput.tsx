@@ -5,7 +5,7 @@ import {
   TextInputProps,
 } from "react-native-paper";
 import { View, Text, StyleSheet } from "react-native";
-import MyText from "./text";
+import { MyText } from "@common_ui";
 import { colors } from "@/lib/theme-colors";
 import { useTheme } from "@/app/hooks/theme.context";
 

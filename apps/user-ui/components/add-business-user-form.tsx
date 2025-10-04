@@ -1,15 +1,15 @@
-import MyText from "@/components/text";
+import { MyText } from "@common_ui";
 import { Image, TouchableOpacity } from "react-native";
 import usePickImage from "@/hooks/usePickImage";
-import MyButton from "@/components/button";
+import { MyButton } from "@common_ui";
 import MyTextInput from "@/components/textinput";
 import React, { useEffect } from "react";
 import {
   View,
   Alert,
 } from "react-native";
-import CustomDropdown from "@/components/dropdown";
-import MultiSelectDropdown from "@/components/multi-select";
+import { CustomDropdown } from "@common_ui";
+import { MultiSelectDropdown } from "@common_ui";
 import tw from "@/app/tailwind";
 import { useRouter } from "expo-router";
 import { Formik } from "formik";
