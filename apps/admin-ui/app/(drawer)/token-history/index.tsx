@@ -1,17 +1,18 @@
 import React, { useState, useMemo } from 'react';
-import { View, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
-import { MyText, tw, BottomDialog, SearchBar, MultiSelectDropdown, DatePicker, MyTextInput, DataTable } from '@common_ui';
-import type { Column } from '@common_ui/src/components/data-table';
+import { View, ScrollView, ActivityIndicator, TouchableOpacity, Platform, FlatList } from 'react-native';
+import { MyText, tw, BottomDialog, SearchBar, MultiSelectDropdown, DatePicker, MyTextInput } from '@common_ui';
 import AppContainer from '@/components/app-container';
 import { ThemedView } from '@/components/ThemedView';
 import { useGetHospitalTokenHistory, TokenHistoryFilters } from '@/api-hooks/token.api';
 import { useGetMyDoctors } from '@/api-hooks/my-doctors.api';
 import { useSearchUserByMobile } from '@/api-hooks/user.api';
 import { Ionicons } from '@expo/vector-icons';
-import dayjs from 'dayjs';
+import TokenHistoryWebView from '@/components/TokenHistoryWebView';
+import TokenHistoryCard from '@/components/TokenHistoryCard';
 
 export default function TokenHistoryScreen() {
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1); // Use 1-based indexing for API
+  const [allTokens, setAllTokens] = useState<any[]>([]);
   const [numberOfItemsPerPageList] = useState([5, 10, 20]);
   const [itemsPerPage, onItemsPerPageChange] = useState(
     numberOfItemsPerPageList[0]
@@ -49,22 +50,8 @@ export default function TokenHistoryScreen() {
     }));
   }, [patients]);
 
-  const { data, isLoading, isError, error } = useGetHospitalTokenHistory(page + 1, itemsPerPage, activeFilters);
+  const { data, isLoading, isError, error } = useGetHospitalTokenHistory(page, itemsPerPage, activeFilters);
   console.log({ error });
-
-  // Define columns for the generic DataTable
-  const columns: Column<any>[] = [
-    { header: 'Q.No', accessor: 'queueNum', style: { flex: 0.6 } },
-    {
-      header: 'Date',
-      accessor: 'tokenDate',
-      style: { flex: 1 },
-      render: (row) => dayjs(row.tokenDate).format('DD-MM-YY'),
-    },
-    { header: 'Doctor', accessor: 'doctorName', style: { flex: 1.5 } },
-    { header: 'Patient', accessor: 'patientName', style: { flex: 1.5 } },
-    { header: 'Status', accessor: 'status', style: { flex: 1 } },
-  ];
   
   const doctorOptions = useMemo(() => {
     return (doctors || []).map(doc => ({
@@ -73,21 +60,41 @@ export default function TokenHistoryScreen() {
     }));
   }, [doctors]);
 
-  const tokens = data?.tokens || [];
   const totalCount = data?.totalCount || 0;
 
-  const from = page * itemsPerPage;
-  const to = Math.min((page + 1) * itemsPerPage, totalCount);
-
+  // Effect to accumulate tokens for infinite scroll
   React.useEffect(() => {
-    setPage(0);
-  }, [itemsPerPage]);
+    if (data?.tokens) {
+      if (page === 1) {
+        setAllTokens(data.tokens); // Reset list for first page
+      } else {
+        // Append for subsequent pages, avoiding duplicates
+        setAllTokens(prevTokens => {
+          const existingIds = new Set(prevTokens.map(t => t.id));
+          const uniqueNewTokens = data.tokens.filter(t => !existingIds.has(t.id));
+          return [...prevTokens, ...uniqueNewTokens];
+        });
+      }
+    }
+  }, [data]);
 
+  // Effect to reset pagination when filters change
   React.useEffect(() => {
-    setPage(0);
-  }, [activeFilters]);
+    setPage(1); // Reset to first page
+    setAllTokens([]); // Clear existing tokens
+  }, [activeFilters, itemsPerPage]);
 
-  if (isLoading) {
+  // from/to logic is only for web pagination
+  const from = (page - 1) * itemsPerPage;
+  const to = Math.min(page * itemsPerPage, totalCount);
+
+  const handleLoadMore = () => {
+    if (!isLoading && allTokens.length < totalCount) {
+      setPage(prevPage => prevPage + 1);
+    }
+  };
+
+  if (isLoading && page === 1) {
     return (
       <AppContainer>
         <View style={tw`flex-1 justify-center items-center`}>
@@ -239,23 +246,43 @@ export default function TokenHistoryScreen() {
           </View>
         </BottomDialog>
 
-        <ScrollView style={tw`flex-1`} showsVerticalScrollIndicator={false}>
-          <ThemedView style={tw`p-5 rounded-2xl shadow-md mb-6 border border-gray-200`}>
-            <DataTable
-              columns={columns}
-              data={tokens}
-              page={page}
-              numberOfPages={Math.ceil(totalCount / itemsPerPage)}
-              onPageChange={setPage}
-              from={from}
-              to={to}
-              totalCount={totalCount}
-              numberOfItemsPerPageList={numberOfItemsPerPageList}
-              itemsPerPage={itemsPerPage}
-              onItemsPerPageChange={onItemsPerPageChange}
-            />
-          </ThemedView>
-        </ScrollView>
+        {Platform.OS === 'web' ? (
+          <TokenHistoryWebView
+            tokens={data?.tokens || []} // Pass single page of tokens
+            page={page - 1} // API is 1-based, component is 0-based
+            totalCount={totalCount}
+            itemsPerPage={itemsPerPage}
+            onPageChange={(p) => setPage(p + 1)} // Adjust for 1-based API
+            numberOfItemsPerPageList={numberOfItemsPerPageList}
+            onItemsPerPageChange={onItemsPerPageChange}
+            from={from}
+            to={to}
+          />
+        ) : (
+          <FlatList
+            data={allTokens}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => <TokenHistoryCard token={item} />}
+            contentContainerStyle={tw`p-4`}
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={() =>
+              isLoading && page > 1 ? (
+                <View style={tw`py-4`}>
+                  <ActivityIndicator size="small" />
+                </View>
+              ) : null
+            }
+            ListEmptyComponent={() =>
+              !isLoading && (
+                <View style={tw`flex-1 justify-center items-center mt-20`}>
+                  <Ionicons name="file-tray-outline" size={48} color={tw.color("gray-400")} />
+                  <MyText style={tw`text-lg text-gray-500 mt-4`}>No tokens found.</MyText>
+                </View>
+              )
+            }
+          />
+        )}
       </ThemedView>
     </AppContainer>
   );

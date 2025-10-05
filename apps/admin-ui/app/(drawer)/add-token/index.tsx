@@ -231,7 +231,7 @@ export default function AddTokenScreen() {
 
       const todaysAvailability = availabilityList[0];
 
-      if (!todaysAvailability) {
+      if (!todaysAvailability || !todaysAvailability.availability) {
         return (
           <View style={tw`items-center py-6`}>
             <Ionicons
@@ -246,6 +246,7 @@ export default function AddTokenScreen() {
         );
       }
 
+      
       const {
         isPaused,
         pauseReason,

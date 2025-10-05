@@ -138,6 +138,27 @@ function _layout(props: Props) {
           }}
         />
         <Drawer.Screen
+          name="todays-tokens"
+          options={{
+            title: "Today's Tokens",
+            headerShown: true,
+            drawerItemStyle: isHospitalAdmin ? {} : { display: "none" },
+            drawerIcon: ({
+              color,
+              focused,
+            }: {
+              focused: boolean;
+              color: string;
+            }) => (
+              <MaterialCommunityIcons
+                color={focused ? theme.colors.blue1 : theme.colors.gray1}
+                name="calendar-clock"
+                size={24}
+              />
+            ),
+          }}
+        />
+        <Drawer.Screen
           name="my-hospital"
           options={{
             title: "My Hospital",
@@ -159,13 +180,11 @@ function _layout(props: Props) {
           }}
         />
         <Drawer.Screen
-          name="todays-tokens"
+          name="token-history"
           options={{
-            title: "Today's Tokens",
+            title: "Token History",
             headerShown: true,
-            drawerItemStyle: isHospitalAdmin ? {} : { display: "none" },
             drawerIcon: ({
-              color,
               focused,
             }: {
               focused: boolean;
@@ -173,7 +192,7 @@ function _layout(props: Props) {
             }) => (
               <MaterialCommunityIcons
                 color={focused ? theme.colors.blue1 : theme.colors.gray1}
-                name="calendar-clock"
+                name="history"
                 size={24}
               />
             ),
@@ -238,25 +257,6 @@ function _layout(props: Props) {
                 name="wallet-outline"
                 size={24}
                 color={focused ? theme.colors.blue1 : theme.colors.gray1}
-              />
-            ),
-          }}
-        />
-        <Drawer.Screen
-          name="token-history"
-          options={{
-            title: "Token History",
-            headerShown: true,
-            drawerIcon: ({
-              focused,
-            }: {
-              focused: boolean;
-              color: string;
-            }) => (
-              <MaterialCommunityIcons
-                color={focused ? theme.colors.blue1 : theme.colors.gray1}
-                name="history"
-                size={24}
               />
             ),
           }}
