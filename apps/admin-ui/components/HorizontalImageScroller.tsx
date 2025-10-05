@@ -14,6 +14,8 @@ const HorizontalImageScroller: React.FC<HorizontalImageScrollerProps> = ({
   imageWidth = 128,
 }) => {
   if (!urls || urls.length === 0) return null;
+  console.log('loading image scroller')
+  
 
   return (
     <View style={styles.container}>

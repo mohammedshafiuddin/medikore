@@ -124,6 +124,7 @@ export default function DoctorTokensPage() {
                   >
                     <MyText style={tw`text-white font-bold`}>Retry</MyText>
                   </TouchableOpacity>
+                  <ViewDoctorDetailsButton doctorId={doctorId!} />
                 </View>
               ) : data?.tokens && data.tokens.length > 0 ? (
                 filterTokensByStatus(data.tokens).map(
@@ -139,6 +140,7 @@ export default function DoctorTokensPage() {
                   <MyText style={tw`text-center text-gray-500 mt-4 text-lg`}>
                     No tokens available for this doctor today.
                   </MyText>
+                  <ViewDoctorDetailsButton doctorId={doctorId!} />
                 </View>
               )}
             </>
@@ -152,3 +154,25 @@ export default function DoctorTokensPage() {
     </AppContainer>
   );
 }
+
+
+interface ViewDoctorDetailsButtonProps {
+  doctorId: number;
+}
+
+const ViewDoctorDetailsButton: React.FC<ViewDoctorDetailsButtonProps> = ({ doctorId }) => {
+  const router = useRouter();
+
+  const handlePress = () => {
+    router.push(`/(drawer)/dashboard/doctor-details/${doctorId}`);
+  };
+
+  return (
+    <TouchableOpacity
+      style={tw`bg-blue-500 px-5 py-3 rounded-xl mt-4`}
+      onPress={handlePress}
+    >
+      <MyText style={tw`text-white font-bold text-center`}>Open Token Slots</MyText>
+    </TouchableOpacity>
+  );
+};

@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Dimensions,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -21,7 +22,8 @@ const ImageViewerURI: React.FC<ImageViewerProps> = ({ uri, style }) => {
   const [loading, setLoading] = useState(false);
 
   const markLoading = () => {
-    if(!Boolean(uri)) return;
+
+    if(!Boolean(uri) || Platform.OS === "web") return;
     setLoading(true);
     setTimeout(() => {
       setLoading(false);

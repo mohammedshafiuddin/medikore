@@ -20,7 +20,7 @@ import {
 import { ErrorToast, SuccessToast } from "@/services/toaster";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { DashboardDoctor } from "shared-types";
+import { DashboardDoctor } from "@common_ui/shared-types";
 import OfflineTokenDialog from "./OfflineTokenDialog";
 
 interface HospitalAdminDashboardProps {
@@ -360,6 +360,16 @@ const DoctorCard: React.FC<DoctorCardProps> = ({
     router.push(`/(drawer)/dashboard/doctor-details/${doctor.id}` as any);
   };
 
+  const [issuedTokens, setIssuedTokens] = useState(doctor.tokensIssuedToday);
+  const [consultationsDone, setConsultationsDone] = useState(
+    doctor.consultationsDone
+  );
+
+  React.useEffect(() => {
+    setIssuedTokens(doctor.tokensIssuedToday);
+    setConsultationsDone(doctor.consultationsDone);
+  }, [doctor]);
+
   return (
     <View
       style={tw`bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-lg mb-5 border border-gray-100 dark:border-gray-700`}
@@ -414,7 +424,10 @@ const DoctorCard: React.FC<DoctorCardProps> = ({
               } rounded-full items-center justify-center ${
                 doctor.tokensIssuedToday <= 0 ? "opacity-50" : ""
               }`}
-              onPress={() => onAdjustTokens(doctor, false)}
+              onPress={() => {
+                setIssuedTokens((prev) => prev - 1);
+                onAdjustTokens(doctor, false);
+              }}
               disabled={isUpdating || doctor.tokensIssuedToday <= 0}
             >
               <MyText
@@ -427,7 +440,7 @@ const DoctorCard: React.FC<DoctorCardProps> = ({
               <MyText
                 style={tw`text-lg font-bold text-gray-800 dark:text-gray-200`}
               >
-                {doctor.tokensIssuedToday}
+                {issuedTokens}
                 <MyText
                   style={tw`text-sm font-normal text-gray-500 dark:text-gray-400`}
                 >
@@ -445,7 +458,10 @@ const DoctorCard: React.FC<DoctorCardProps> = ({
                   ? "opacity-50"
                   : ""
               }`}
-              onPress={() => onAdjustTokens(doctor, true)}
+              onPress={() => {
+                setIssuedTokens((prev) => prev + 1);
+                onAdjustTokens(doctor, true);
+              }}
               disabled={
                 isUpdating || doctor.tokensIssuedToday >= doctor.totalTokenCount
               }
@@ -475,7 +491,10 @@ const DoctorCard: React.FC<DoctorCardProps> = ({
               } rounded-full items-center justify-center ${
                 doctor.consultationsDone <= 0 ? "opacity-50" : ""
               }`}
-              onPress={() => onAdjustConsultations(doctor, false)}
+              onPress={() => {
+                setConsultationsDone((prev) => prev - 1);
+                onAdjustConsultations(doctor, false);
+              }}
               disabled={isUpdating || doctor.consultationsDone <= 0}
             >
               <MyText
@@ -488,7 +507,7 @@ const DoctorCard: React.FC<DoctorCardProps> = ({
               <MyText
                 style={tw`text-lg font-bold text-gray-800 dark:text-gray-200`}
               >
-                {doctor.consultationsDone}
+                {consultationsDone}
               </MyText>
             </View>
             <TouchableOpacity
@@ -497,7 +516,10 @@ const DoctorCard: React.FC<DoctorCardProps> = ({
                   ? "bg-gray-300 dark:bg-gray-600"
                   : "bg-gray-200 dark:bg-gray-600"
               } rounded-full items-center justify-center`}
-              onPress={() => onAdjustConsultations(doctor, true)}
+              onPress={() => {
+                setConsultationsDone((prev) => prev + 1);
+                onAdjustConsultations(doctor, true);
+              }}
               disabled={isUpdating}
             >
               <MyText
