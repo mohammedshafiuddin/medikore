@@ -297,13 +297,51 @@ interface GetHospitalTokenHistoryResponse {
  * @param page The current page number (1-indexed)
  * @param limit The number of items per page
  */
-export const useGetHospitalTokenHistory = (page: number, limit: number) => {
+export interface TokenHistoryFilters {
+  doctorIds?: string[];
+  patientIds?: string[];
+  statuses?: string[];
+  startDate?: string | null;
+  endDate?: string | null;
+}
+
+/**
+ * Hook to fetch token history for doctors in the hospital (hospital admin view)
+ * @param page The current page number (1-indexed)
+ * @param limit The number of items per page
+ * @param filters An object containing filter criteria
+ */
+export const useGetHospitalTokenHistory = (
+  page: number,
+  limit: number,
+  filters: TokenHistoryFilters
+) => {
   return useQuery<GetHospitalTokenHistoryResponse>({
-    queryKey: ["hospitalTokenHistory", page, limit],
+    queryKey: ["hospitalTokenHistory", page, limit, filters],
     queryFn: async () => {
-      console.log("Attempting to fetch hospital token history..."); // Debug log
-      const response = await axios.get( // Changed axiosInstance to axios
-        `/tokens/history?page=${page}&limit=${limit}`
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+      });
+
+      if (filters.doctorIds && filters.doctorIds.length > 0) {
+        params.append("doctorIds", filters.doctorIds.join(","));
+      }
+      if (filters.patientIds && filters.patientIds.length > 0) {
+        params.append("patientIds", filters.patientIds.join(","));
+      }
+      if (filters.statuses && filters.statuses.length > 0) {
+        params.append("statuses", filters.statuses.join(","));
+      }
+      if (filters.startDate) {
+        params.append("startDate", filters.startDate);
+      }
+      if (filters.endDate) {
+        params.append("endDate", filters.endDate);
+      }
+
+      const response = await axios.get(
+        `/tokens/history?${params.toString()}`
       );
       return response.data;
     },

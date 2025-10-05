@@ -1249,22 +1249,21 @@ export const getHospitalTokenHistory = async (
     throw new ApiError("User not authenticated", 401);
   }
 
-  // Find the hospital where the user is an admin
+  // Authorization: Ensure user is a hospital admin
   const hospitalEmployee = await db.query.hospitalEmployeesTable.findFirst({
     where: eq(hospitalEmployeesTable.userId, userId),
   });
 
-  if (!hospitalEmployee) {
-    throw new ApiError("User is not associated with any hospital", 404);
-  }
-
-  if (hospitalEmployee.designation !== DESIGNATIONS.HOSPITAL_ADMIN) {
+  if (
+    !hospitalEmployee ||
+    hospitalEmployee.designation !== DESIGNATIONS.HOSPITAL_ADMIN
+  ) {
     throw new ApiError("Not authorized to view token history", 403);
   }
 
   const hospitalId = hospitalEmployee.hospitalId;
 
-  // Get all doctors who work at this hospital
+  // Get all doctors in the admin's hospital to establish the base scope
   const hospitalDoctors = await db.query.hospitalEmployeesTable.findMany({
     where: and(
       eq(hospitalEmployeesTable.hospitalId, hospitalId),
@@ -1272,9 +1271,9 @@ export const getHospitalTokenHistory = async (
     ),
   });
 
-  const doctorIds = hospitalDoctors.map((doctor) => doctor.userId);
+  const hospitalDoctorIds = hospitalDoctors.map((doctor) => doctor.userId);
 
-  if (doctorIds.length === 0) {
+  if (hospitalDoctorIds.length === 0) {
     return res.status(200).json({
       message: "No doctors found in this hospital",
       tokens: [],
@@ -1284,13 +1283,60 @@ export const getHospitalTokenHistory = async (
     });
   }
 
+  // --- Filter Logic ---
+  const {
+    doctorIds: doctorIdsQuery,
+    patientIds: patientIdsQuery,
+    statuses: statusesQuery,
+    startDate,
+    endDate,
+  } = req.query;
+
+  const conditions = [inArray(tokenInfoTable.doctorId, hospitalDoctorIds)];
+
+  if (doctorIdsQuery) {
+    const filteredDoctorIds = (doctorIdsQuery as string)
+      .split(",")
+      .map(Number);
+    if (filteredDoctorIds.length > 0) {
+      conditions.push(inArray(tokenInfoTable.doctorId, filteredDoctorIds));
+    }
+  }
+
+  if (patientIdsQuery) {
+    const filteredPatientIds = (patientIdsQuery as string)
+      .split(",")
+      .map(Number);
+    if (filteredPatientIds.length > 0) {
+      conditions.push(inArray(tokenInfoTable.userId, filteredPatientIds));
+    }
+  }
+  
+  if (statusesQuery) {
+    const filteredStatuses = (statusesQuery as string).split(",");
+    if (filteredStatuses.length > 0) {
+      conditions.push(inArray(tokenInfoTable.status, filteredStatuses));
+    }
+  }
+
+  if (startDate) {
+    conditions.push(gte(tokenInfoTable.tokenDate, startDate as string));
+  }
+
+  if (endDate) {
+    conditions.push(lte(tokenInfoTable.tokenDate, endDate as string));
+  }
+
+  // --- Pagination ---
   const page = parseInt(req.query.page as string) || 1;
   const limit = parseInt(req.query.limit as string) || 10;
   const offset = (page - 1) * limit;
 
-  // Fetch tokens with doctor and patient details
+  const combinedConditions = and(...conditions);
+
+  // --- Database Query ---
   const tokens = await db.query.tokenInfoTable.findMany({
-    where: inArray(tokenInfoTable.doctorId, doctorIds),
+    where: combinedConditions,
     with: {
       user: {
         with: {
@@ -1304,14 +1350,15 @@ export const getHospitalTokenHistory = async (
     offset: offset,
   });
 
-  // Get total count for pagination
+  // Get total count with the same filters for pagination
   const totalCountResult = await db
     .select({ count: sql<number>`count(*)` })
     .from(tokenInfoTable)
-    .where(inArray(tokenInfoTable.doctorId, doctorIds));
+    .where(combinedConditions);
 
   const totalCount = totalCountResult[0].count;
 
+  // --- Formatting Response ---
   const formattedTokens = tokens.map((token) => ({
     id: token.id,
     queueNum: token.queueNum,

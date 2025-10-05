@@ -16,6 +16,7 @@ import { AuthProvider } from "@/components/context/auth-context";
 import { usePathname } from "expo-router";
 import Toast from "react-native-toast-message";
 import { NotificationProvider } from "@/services/notif-service/notif-context";
+import { Provider as PaperProvider } from 'react-native-paper';
 // import {
 //   NotificationContext,
 //   NotificationProvider,
@@ -37,9 +38,13 @@ export default function RootLayout() {
       <View style={{ flex: 1, backgroundColor: "white" }}>
         <NotificationProvider>
           <QueryClientProvider client={queryClient}>
+            <PaperProvider>
+
             <AuthProvider>
+
               <Stack screenOptions={{ headerShown: false }} />
             </AuthProvider>
+            </PaperProvider>
           </QueryClientProvider>
         </NotificationProvider>
       </View>
