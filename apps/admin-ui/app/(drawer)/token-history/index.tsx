@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { View, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
-import { MyText, tw, BottomDialog, SearchBar, MultiSelectDropdown, DatePicker, MyTextInput } from '@common_ui';
+import { MyText, tw, BottomDialog, SearchBar, MultiSelectDropdown, DatePicker, MyTextInput, DataTable } from '@common_ui';
+import type { Column } from '@common_ui/src/components/data-table';
 import AppContainer from '@/components/app-container';
 import { ThemedView } from '@/components/ThemedView';
-import { DataTable } from 'react-native-paper';
 import { useGetHospitalTokenHistory, TokenHistoryFilters } from '@/api-hooks/token.api';
 import { useGetMyDoctors } from '@/api-hooks/my-doctors.api';
 import { useSearchUserByMobile } from '@/api-hooks/user.api';
@@ -51,6 +51,20 @@ export default function TokenHistoryScreen() {
 
   const { data, isLoading, isError, error } = useGetHospitalTokenHistory(page + 1, itemsPerPage, activeFilters);
   console.log({ error });
+
+  // Define columns for the generic DataTable
+  const columns: Column<any>[] = [
+    { header: 'Q.No', accessor: 'queueNum', style: { flex: 0.6 } },
+    {
+      header: 'Date',
+      accessor: 'tokenDate',
+      style: { flex: 1 },
+      render: (row) => dayjs(row.tokenDate).format('DD-MM-YY'),
+    },
+    { header: 'Doctor', accessor: 'doctorName', style: { flex: 1.5 } },
+    { header: 'Patient', accessor: 'patientName', style: { flex: 1.5 } },
+    { header: 'Status', accessor: 'status', style: { flex: 1 } },
+  ];
   
   const doctorOptions = useMemo(() => {
     return (doctors || []).map(doc => ({
@@ -226,38 +240,20 @@ export default function TokenHistoryScreen() {
         </BottomDialog>
 
         <ScrollView style={tw`flex-1`} showsVerticalScrollIndicator={false}>
-          <ThemedView style={tw` rounded-2xl shadow-md mb-6 border border-gray-200`}>
-            <DataTable>
-              <DataTable.Header>
-                <DataTable.Title style={{ flex: 0.6 }}>Q.No</DataTable.Title>
-                <DataTable.Title style={{ flex: 1 }}>Date</DataTable.Title>
-                <DataTable.Title style={{ flex: 1.5 }}>Doctor</DataTable.Title>
-                <DataTable.Title style={{ flex: 1.5 }}>Patient</DataTable.Title>
-                <DataTable.Title style={{ flex: 1 }}>Status</DataTable.Title>
-              </DataTable.Header>
-
-              {tokens.map((token) => (
-                <DataTable.Row key={token.id}>
-                  <DataTable.Cell style={{ flex: 0.6 }}>{token.queueNum}</DataTable.Cell>
-                  <DataTable.Cell style={{ flex: 1 }}>{dayjs(token.tokenDate).format('DD-MM-YY')}</DataTable.Cell>
-                  <DataTable.Cell style={{ flex: 1.5 }}>{token.doctorName}</DataTable.Cell>
-                  <DataTable.Cell style={{ flex: 1.5 }}>{token.patientName}</DataTable.Cell>
-                  <DataTable.Cell style={{ flex: 1 }}>{token.status}</DataTable.Cell>
-                </DataTable.Row>
-              ))}
-
-              <DataTable.Pagination
-                page={page}
-                numberOfPages={Math.ceil(totalCount / itemsPerPage)}
-                onPageChange={(page) => setPage(page)}
-                label={`${from + 1}-${to} of ${totalCount}`}
-                numberOfItemsPerPageList={numberOfItemsPerPageList}
-                numberOfItemsPerPage={itemsPerPage}
-                onItemsPerPageChange={onItemsPerPageChange}
-                showFastPaginationControls
-                selectPageDropdownLabel={'Rows per page'}
-              />
-            </DataTable>
+          <ThemedView style={tw`p-5 rounded-2xl shadow-md mb-6 border border-gray-200`}>
+            <DataTable
+              columns={columns}
+              data={tokens}
+              page={page}
+              numberOfPages={Math.ceil(totalCount / itemsPerPage)}
+              onPageChange={setPage}
+              from={from}
+              to={to}
+              totalCount={totalCount}
+              numberOfItemsPerPageList={numberOfItemsPerPageList}
+              itemsPerPage={itemsPerPage}
+              onItemsPerPageChange={onItemsPerPageChange}
+            />
           </ThemedView>
         </ScrollView>
       </ThemedView>

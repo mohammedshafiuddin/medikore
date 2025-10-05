@@ -24,6 +24,7 @@ import AppContainer from "./src/components/app-container";
 import tw from "./src/lib/tailwind";
 import BottomDropdown from './src/components/bottom-dropdown';
 import SearchBar from './src/components/search-bar'
+import DataTable from './src/components/data-table';
 
 
 export {
@@ -54,5 +55,6 @@ export {
   AppContainer,
   tw,
   BottomDropdown,
-  SearchBar
+  SearchBar,
+  DataTable
 };
