@@ -264,7 +264,7 @@ export function useCreateLocalToken() {
  * @param query The search query
  */
 export function useSearchDoctorTokens(doctorId: number | null, query: string) {
-  return useQuery<DoctorTodayToken[]>({
+  return useQuery<DoctorTodayToken[]>({ 
     queryKey: ['search-doctor-tokens', doctorId, query],
     queryFn: async () => {
       const response = await axios.get(`/tokens/search?doctorId=${doctorId}&query=${encodeURIComponent(query)}`);
@@ -273,3 +273,39 @@ export function useSearchDoctorTokens(doctorId: number | null, query: string) {
     enabled: !!query && query.trim().length > 0 && !!doctorId,
   });
 }
+
+// Interface for the new API response
+interface GetHospitalTokenHistoryResponse {
+  message: string;
+  tokens: {
+    id: number;
+    queueNum: number;
+    tokenDate: string;
+    doctorName: string;
+    patientName: string;
+    patientMobile: string;
+    status: string;
+    description: string;
+  }[];
+  totalCount: number;
+  page: number;
+  limit: number;
+}
+
+/**
+ * Hook to fetch token history for doctors in the hospital (hospital admin view)
+ * @param page The current page number (1-indexed)
+ * @param limit The number of items per page
+ */
+export const useGetHospitalTokenHistory = (page: number, limit: number) => {
+  return useQuery<GetHospitalTokenHistoryResponse>({
+    queryKey: ["hospitalTokenHistory", page, limit],
+    queryFn: async () => {
+      console.log("Attempting to fetch hospital token history..."); // Debug log
+      const response = await axios.get( // Changed axiosInstance to axios
+        `/tokens/history?page=${page}&limit=${limit}`
+      );
+      return response.data;
+    },
+  });
+};

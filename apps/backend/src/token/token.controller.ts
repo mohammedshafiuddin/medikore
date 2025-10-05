@@ -1230,3 +1230,104 @@ export const searchToken = async (
 
   res.status(200).send(allTokens);
 };
+
+/**
+ * Get token history for doctors in the hospital (hospital admin view)
+ *
+ * @param req Request object containing optional page and limit query parameters
+ * @param res Response object
+ * @param next Next function
+ */
+export const getHospitalTokenHistory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const userId = req.user?.userId;
+
+  if (!userId) {
+    throw new ApiError("User not authenticated", 401);
+  }
+
+  // Find the hospital where the user is an admin
+  const hospitalEmployee = await db.query.hospitalEmployeesTable.findFirst({
+    where: eq(hospitalEmployeesTable.userId, userId),
+  });
+
+  if (!hospitalEmployee) {
+    throw new ApiError("User is not associated with any hospital", 404);
+  }
+
+  if (hospitalEmployee.designation !== DESIGNATIONS.HOSPITAL_ADMIN) {
+    throw new ApiError("Not authorized to view token history", 403);
+  }
+
+  const hospitalId = hospitalEmployee.hospitalId;
+
+  // Get all doctors who work at this hospital
+  const hospitalDoctors = await db.query.hospitalEmployeesTable.findMany({
+    where: and(
+      eq(hospitalEmployeesTable.hospitalId, hospitalId),
+      eq(hospitalEmployeesTable.designation, DESIGNATIONS.DOCTOR)
+    ),
+  });
+
+  const doctorIds = hospitalDoctors.map((doctor) => doctor.userId);
+
+  if (doctorIds.length === 0) {
+    return res.status(200).json({
+      message: "No doctors found in this hospital",
+      tokens: [],
+      totalCount: 0,
+      page: 1,
+      limit: 10,
+    });
+  }
+
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const offset = (page - 1) * limit;
+
+  // Fetch tokens with doctor and patient details
+  const tokens = await db.query.tokenInfoTable.findMany({
+    where: inArray(tokenInfoTable.doctorId, doctorIds),
+    with: {
+      user: {
+        with: {
+          mobileNumber: true,
+        },
+      },
+      doctor: true,
+    },
+    orderBy: [desc(tokenInfoTable.tokenDate), tokenInfoTable.queueNum],
+    limit: limit,
+    offset: offset,
+  });
+
+  // Get total count for pagination
+  const totalCountResult = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(tokenInfoTable)
+    .where(inArray(tokenInfoTable.doctorId, doctorIds));
+
+  const totalCount = totalCountResult[0].count;
+
+  const formattedTokens = tokens.map((token) => ({
+    id: token.id,
+    queueNum: token.queueNum,
+    tokenDate: token.tokenDate,
+    doctorName: token.doctor.name,
+    patientName: token.user.name,
+    patientMobile: token.user.mobileNumber?.mobile,
+    status: token.status,
+    description: token.description,
+  }));
+
+  res.status(200).json({
+    message: "Token history retrieved successfully",
+    tokens: formattedTokens,
+    totalCount,
+    page,
+    limit,
+  });
+};

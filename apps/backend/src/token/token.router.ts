@@ -8,7 +8,8 @@ import {
   updateTokenStatus,
   createOfflineToken,
   createLocalToken,
-  searchToken
+  searchToken,
+  getHospitalTokenHistory
 } from './token.controller';
 import { verifyToken } from '../middleware/auth';
 
@@ -76,6 +77,13 @@ router.post('/offline', verifyToken, createOfflineToken);
  * @access  Private - Requires authentication (hospital admin only)
  */
 router.get('/search', verifyToken, searchToken);
+
+/**
+ * @route   GET /api/token/history
+ * @desc    Get token history for doctors in the hospital (hospital admin view)
+ * @access  Private - Requires authentication (hospital admin only)
+ */
+router.get('/history', verifyToken, getHospitalTokenHistory);
 
 
 export default router;
