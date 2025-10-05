@@ -243,6 +243,25 @@ function _layout(props: Props) {
           }}
         />
         <Drawer.Screen
+          name="token-history"
+          options={{
+            title: "Token History",
+            headerShown: true,
+            drawerIcon: ({
+              focused,
+            }: {
+              focused: boolean;
+              color: string;
+            }) => (
+              <MaterialCommunityIcons
+                color={focused ? theme.colors.blue1 : theme.colors.gray1}
+                name="history"
+                size={24}
+              />
+            ),
+          }}
+        />
+        <Drawer.Screen
           name="my-profile"
           options={{
             title: "My Profile",
