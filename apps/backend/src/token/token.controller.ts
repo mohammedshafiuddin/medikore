@@ -14,7 +14,7 @@ import {
   mobileNumbersTable,
   userInfoTable,
 } from "../db/schema";
-import { eq, and, sql, desc, gte, inArray, or, like } from "drizzle-orm";
+import { eq, and, sql, desc, gte, inArray, or, like, lte } from "drizzle-orm";
 import { ApiError } from "../lib/api-error";
 import {
   UpcomingToken,

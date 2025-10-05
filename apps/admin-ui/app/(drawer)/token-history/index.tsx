@@ -8,6 +8,7 @@ import { useGetHospitalTokenHistory, TokenHistoryFilters } from '@/api-hooks/tok
 import { useGetMyDoctors } from '@/api-hooks/my-doctors.api';
 import { useSearchUserByMobile } from '@/api-hooks/user.api';
 import { Ionicons } from '@expo/vector-icons';
+import dayjs from 'dayjs';
 
 export default function TokenHistoryScreen() {
   const [page, setPage] = useState(0);
@@ -68,6 +69,10 @@ export default function TokenHistoryScreen() {
     setPage(0);
   }, [itemsPerPage]);
 
+  React.useEffect(() => {
+    setPage(0);
+  }, [activeFilters]);
+
   if (isLoading) {
     return (
       <AppContainer>
@@ -99,7 +104,7 @@ export default function TokenHistoryScreen() {
   return (
     <AppContainer>
       <ThemedView style={tw`flex-1`}>
-        <View style={tw`p-4`}>
+        <View style={tw``}>
           <MyText style={tw`text-2xl font-bold text-gray-800 dark:text-white mb-4`}>
             Token History
           </MyText>
@@ -121,7 +126,7 @@ export default function TokenHistoryScreen() {
         </View>
 
         <BottomDialog open={isFilterVisible} onClose={() => setFilterVisible(false)}>
-          <View style={tw`p-4`}>
+          <View style={tw``}>
             <MyText style={tw`text-lg font-bold mb-4`}>Filter Options</MyText>
 
             <MyText style={tw`text-base font-semibold mb-2`}>By Doctor</MyText>
@@ -220,24 +225,24 @@ export default function TokenHistoryScreen() {
           </View>
         </BottomDialog>
 
-        <ScrollView style={tw`flex-1 px-4`} showsVerticalScrollIndicator={false}>
-          <ThemedView style={tw`p-5 rounded-2xl shadow-md mb-6 border border-gray-200`}>
+        <ScrollView style={tw`flex-1`} showsVerticalScrollIndicator={false}>
+          <ThemedView style={tw` rounded-2xl shadow-md mb-6 border border-gray-200`}>
             <DataTable>
               <DataTable.Header>
-                <DataTable.Title>Queue No.</DataTable.Title>
-                <DataTable.Title>Date</DataTable.Title>
-                <DataTable.Title>Doctor</DataTable.Title>
-                <DataTable.Title>Patient</DataTable.Title>
-                <DataTable.Title>Status</DataTable.Title>
+                <DataTable.Title style={{ flex: 0.6 }}>Q.No</DataTable.Title>
+                <DataTable.Title style={{ flex: 1 }}>Date</DataTable.Title>
+                <DataTable.Title style={{ flex: 1.5 }}>Doctor</DataTable.Title>
+                <DataTable.Title style={{ flex: 1.5 }}>Patient</DataTable.Title>
+                <DataTable.Title style={{ flex: 1 }}>Status</DataTable.Title>
               </DataTable.Header>
 
               {tokens.map((token) => (
                 <DataTable.Row key={token.id}>
-                  <DataTable.Cell>{token.queueNum}</DataTable.Cell>
-                  <DataTable.Cell>{token.tokenDate}</DataTable.Cell>
-                  <DataTable.Cell>{token.doctorName}</DataTable.Cell>
-                  <DataTable.Cell>{token.patientName}</DataTable.Cell>
-                  <DataTable.Cell>{token.status}</DataTable.Cell>
+                  <DataTable.Cell style={{ flex: 0.6 }}>{token.queueNum}</DataTable.Cell>
+                  <DataTable.Cell style={{ flex: 1 }}>{dayjs(token.tokenDate).format('DD-MM-YY')}</DataTable.Cell>
+                  <DataTable.Cell style={{ flex: 1.5 }}>{token.doctorName}</DataTable.Cell>
+                  <DataTable.Cell style={{ flex: 1.5 }}>{token.patientName}</DataTable.Cell>
+                  <DataTable.Cell style={{ flex: 1 }}>{token.status}</DataTable.Cell>
                 </DataTable.Row>
               ))}
 
