@@ -16,7 +16,17 @@ import {
   mobileNumbersTable,
 } from "../db/schema";
 import bcrypt from "bcryptjs";
-import { eq, and, or, inArray, isNotNull, ne, gte, sql, like } from "drizzle-orm";
+import {
+  eq,
+  and,
+  or,
+  inArray,
+  isNotNull,
+  ne,
+  gte,
+  sql,
+  like,
+} from "drizzle-orm";
 import { ApiError } from "../lib/api-error";
 import jwt from "jsonwebtoken";
 import roleManager, { ROLE_NAMES, defaultRole } from "../lib/roles-manager";
@@ -53,15 +63,23 @@ export const signup = async (
     }
 
     // Check if user with the same email, mobile, or username already exists
-    const existingUser = await db.query.usersTable.findFirst({
-      where: (users) => {
-        return or(
-          eq(users.email, email),
-          eq(users.mobile, mobile),
-          username ? eq(users.username, username) : undefined
-        );
-      },
-    });
+    // const existingUser = await db.query.usersTable.findFirst({
+    //   where: (users) => {
+    //     return or(
+    //       eq(users.email, email),
+    //       eq(users.mobile, mobile),
+    //       username ? eq(users.username, username) : undefined
+    //     );
+    //   },
+    // });
+    const existingUser = await db
+      .select()
+      .from(usersTable)
+      .leftJoin(
+        mobileNumbersTable,
+        eq(mobileNumbersTable.id, usersTable.mobileId)
+      )
+      .where(eq(mobileNumbersTable.mobile, mobile))
 
     if (existingUser) {
       throw new ApiError(
@@ -77,12 +95,19 @@ export const signup = async (
     // Start a transaction
     return await db.transaction(async (tx) => {
       // Create a new user
+      const mobileRecord = await tx
+        .insert(mobileNumbersTable)
+        .values({
+          mobile,
+        })
+        .returning();
       const [newUser] = await tx
         .insert(usersTable)
         .values({
           name,
           email,
-          mobile,
+          // mobile,
+          mobileId: mobileRecord[0].id,
           address,
           username: username,
           joinDate: new Date().toISOString(),
@@ -123,7 +148,7 @@ export const signup = async (
           id: newUser.id,
           name: newUser.name,
           email: newUser.email,
-          mobile: newUser.mobile,
+          mobile: mobileRecord[0].mobile,
           profilePicUrl: newUser.profilePicUrl, // Include profilePic URL in the response
         },
         message: "User created successfully",
@@ -156,20 +181,27 @@ export const login = async (
 
   // Find user based on login method
   let user;
+  let mobileRecord;
   if (useUsername) {
     // If useUsername flag is set, only check username
     user = await db.query.usersTable.findFirst({
       where: (users) => eq(users.username, login),
       with: {
         userInfo: true,
+        mobileNumber: true,
       },
     });
   } else {
+    mobileRecord = await db.query.mobileNumbersTable.findFirst({
+      where: eq(mobileNumbersTable.mobile, login)
+    })
     // Mobile number login
     user = await db.query.usersTable.findFirst({
-      where: (users) => eq(users.mobile, login),
+      // where: (users) => eq(users.mobile, login),
+      where: eq(mobileNumbersTable.mobile, login),
       with: {
         userInfo: true,
+        mobileNumber: true,
       },
     });
   }
@@ -191,7 +223,7 @@ export const login = async (
   // Verify password
   const isPasswordValid = await bcrypt.compare(
     password,
-    user.userInfo.password
+    mobileRecord?.password || ''
   );
   if (!isPasswordValid) {
     throw new ApiError("Invalid credentials", 401);
@@ -229,7 +261,7 @@ export const login = async (
   const tokenPayload = {
     userId: user.id,
     email: user.email,
-    mobile: user.mobile,
+    mobile: mobileRecord?.mobile,
     roles: roleNames,
     tokenVersion: user.userInfo.activeTokenVersion,
   };
@@ -249,7 +281,7 @@ export const login = async (
       id: user.id,
       name: user.name,
       email: user.email,
-      mobile: user.mobile,
+      mobile: mobileRecord?.mobile,
       roles: roleNames,
     },
     token,
@@ -362,7 +394,7 @@ export const addBusinessUser = async (
       .values({
         name,
         username: username, // Store username directly in the username field
-        mobile: username + "_mobile", // Dummy mobile for uniqueness
+        // mobile: username + "_mobile", // Dummy mobile for uniqueness
         joinDate: new Date().toISOString(),
         profilePicUrl, // Save the profilePic URL in the user table
       })
@@ -680,6 +712,7 @@ export const getUserById = async (
           role: true,
         },
       },
+      mobileNumber: true,
     },
   });
 
@@ -705,7 +738,7 @@ export const getUserById = async (
     id: user.id,
     name: user.name,
     email: user.email,
-    mobile: user.mobile,
+    mobile: user.mobileNumber?.mobile,
     username: user.username,
     address: user.address,
     profilePicUrl: signedProfilePicUrl,
@@ -790,6 +823,7 @@ export const getDoctorById = async (
           role: true,
         },
       },
+      mobileNumber: true,
     },
   });
 
@@ -818,7 +852,7 @@ export const getDoctorById = async (
   const doctorInfo = await db.query.doctorInfoTable.findFirst({
     where: (docs) => eq(docs.userId, userId),
   });
-  
+
   if (!doctorInfo) {
     throw new ApiError("Doctor information not found", 404);
   }
@@ -836,22 +870,18 @@ export const getDoctorById = async (
     .where(eq(hospitalEmployeesTable.userId, user.id));
 
   // Get specializations
-  const specializations =
-    await db.query.doctorSpecializationsTable.findMany({
-      where: (specs) => eq(specs.doctorId, user.id), // Use user ID directly
-      with: {
-        specialization: true,
-      },
-    });
+  const specializations = await db.query.doctorSpecializationsTable.findMany({
+    where: (specs) => eq(specs.doctorId, user.id), // Use user ID directly
+    with: {
+      specialization: true,
+    },
+  });
 
   // Get today's availability to check if consultations are paused
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split("T")[0];
   const todayAvailability = await db.query.doctorAvailabilityTable.findFirst({
-    where: (availability) => 
-      and(
-        eq(availability.doctorId, user.id),
-        eq(availability.date, today)
-      ),
+    where: (availability) =>
+      and(eq(availability.doctorId, user.id), eq(availability.date, today)),
   });
 
   // Format doctor response
@@ -860,7 +890,7 @@ export const getDoctorById = async (
     name: user.name,
     username: user.username,
     email: user.email,
-    mobile: user.mobile,
+    mobile: user.mobileNumber?.mobile,
     profilePicUrl: signedProfilePicUrl,
     address: user.address,
     joinDate: user.joinDate,
@@ -925,6 +955,7 @@ export const updateUser = async (
             role: true,
           },
         },
+        mobileNumber: true,
         userInfo: true,
       },
     });
@@ -938,7 +969,9 @@ export const updateUser = async (
     const emailChanged =
       email !== undefined && email !== null && email !== existingUser.email;
     const mobileChanged =
-      mobile !== undefined && mobile !== null && mobile !== existingUser.mobile;
+      mobile !== undefined &&
+      mobile !== null &&
+      mobile !== existingUser.mobileNumber?.mobile;
 
     if (emailChanged || mobileChanged) {
       // Build query conditions for checking conflicts
@@ -949,7 +982,7 @@ export const updateUser = async (
       }
 
       if (mobileChanged) {
-        conflictConditions.push(eq(usersTable.mobile, mobile));
+        conflictConditions.push(eq(mobileNumbersTable.mobile, mobile));
       }
 
       // Check for conflicts with other users
@@ -962,6 +995,9 @@ export const updateUser = async (
                 ? or(...conflictConditions)
                 : conflictConditions[0]
             );
+          },
+          with: {
+            mobileNumber: true,
           },
         });
 
@@ -1309,8 +1345,7 @@ export const getUpcomingTokens = async (
 // Check if user's push token exists in notif_creds table
 export const hasPushToken = async (req: Request, res: Response) => {
   let currUser = req.user;
-  if(!currUser)
-      throw new ApiError("User Not Found");
+  if (!currUser) throw new ApiError("User Not Found");
 
   const record = await db.query.notifCredsTable.findFirst({
     where: eq(notifCredsTable.userId, currUser.id),
@@ -1348,30 +1383,36 @@ export const addPushToken = async (req: Request, res: Response) => {
 /**
  * Search for users by mobile number
  */
-export const searchUsersByMobile = async (req: Request, res: Response, next: NextFunction) => {
-    const { mobile } = req.query;
+export const searchUsersByMobile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { mobile } = req.query;
 
-    if (!mobile) {
-      throw new ApiError("Mobile number is required for search", 400);
-    }
+  if (!mobile) {
+    throw new ApiError("Mobile number is required for search", 400);
+  }
 
-    const mobileQuery = mobile as string;
-    console.log({mobileQuery})
-    
+  const mobileQuery = mobile as string;
+  console.log({ mobileQuery });
 
-    const users = await db
-      .select({
-        id: usersTable.id,
-        name: usersTable.name,
-        email: usersTable.email,
-        mobile: mobileNumbersTable.mobile,
-        age: userInfoTable.age,
-        gender: userInfoTable.gender,
-      })
-      .from(usersTable)
-      .leftJoin(userInfoTable, eq(usersTable.id, userInfoTable.userId))
-      .leftJoin(mobileNumbersTable, eq(usersTable.mobileId, mobileNumbersTable.id))
-      .where(eq(mobileNumbersTable.mobile, mobileQuery));
+  const users = await db
+    .select({
+      id: usersTable.id,
+      name: usersTable.name,
+      email: usersTable.email,
+      mobile: mobileNumbersTable.mobile,
+      age: userInfoTable.age,
+      gender: userInfoTable.gender,
+    })
+    .from(usersTable)
+    .leftJoin(userInfoTable, eq(usersTable.id, userInfoTable.userId))
+    .leftJoin(
+      mobileNumbersTable,
+      eq(usersTable.mobileId, mobileNumbersTable.id)
+    )
+    .where(eq(mobileNumbersTable.mobile, mobileQuery));
 
-    return res.status(200).json({ users: users });
+  return res.status(200).json({ users: users });
 };

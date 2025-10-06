@@ -1,4 +1,4 @@
-import { doctorAvailabilityTable } from "../db/schema.js";
+import { doctorAvailabilityTable, mobileNumbersTable } from "../db/schema.js";
 import { and } from "drizzle-orm";
 import { NextFunction, Request, Response } from "express";
 import { db } from "../db/db_index.js";
@@ -78,11 +78,12 @@ export const getDoctorResponders = async (req: Request, res: Response, next: Nex
                 id: usersTable.id,
                 name: usersTable.name,
                 email: usersTable.email,
-                mobile: usersTable.mobile,
+                mobile: mobileNumbersTable.mobile,
                 profilePicUrl: usersTable.profilePicUrl
             })
             .from(doctorSecretariesTable)
             .innerJoin(usersTable, eq(doctorSecretariesTable.secretaryId, usersTable.id))
+            .leftJoin(usersTable, eq(usersTable.mobileId, mobileNumbersTable.id))
             .where(eq(doctorSecretariesTable.doctorId, doctorId));
         
         return res.status(200).json({

@@ -562,7 +562,7 @@ export const getHospitalTodaysTokens = async (
           patientName: token.user.name,
           patientMobile: token.user.mobileNumber?.mobile,
           description: token.description,
-          status: token.status!,
+          status: token.status! as any,
         };
       });
 
@@ -798,18 +798,13 @@ export const getDoctorTodaysTokens = async (
         eq(tokenInfoTable.tokenDate, today)
       ),
       with: {
-        user: true,
+        user: {
+          with: {
+            mobileNumber: true,
+          }
+        }
       },
       orderBy: tokenInfoTable.queueNum,
-    });
-
-    // Get all offline tokens for the doctor for today
-    const offlineTokens = await db.query.offlineTokensTable.findMany({
-      where: and(
-        eq(offlineTokensTable.doctorId, doctorId),
-        eq(offlineTokensTable.date, today)
-      ),
-      orderBy: offlineTokensTable.tokenNum,
     });
 
     // Combine and sort all tokens
@@ -820,7 +815,7 @@ export const getDoctorTodaysTokens = async (
         queueNum: token.queueNum,
         patientId: token.userId,
         patientName: token.user.name,
-        patientMobile: token.user.mobile,
+        patientMobile: token.user.mobileNumber?.mobile,
         description: token.description,
         status: token.status,
       })),
@@ -1226,7 +1221,7 @@ export const searchToken = async (
       description: token.description,
       status: token.status,
     })),
-  ].sort((a, b) => a.queueNum - b.queueNum);
+  ].sort((a, b) => a.queueNumber - b.queueNumber);
 
   res.status(200).send(allTokens);
 };
