@@ -1,12 +1,10 @@
 import React from 'react';
 import { ScrollView, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import { tw } from '@common_ui';
-import { MyText } from "@common_ui";
+import { tw , MyText , ROLE_NAMES } from 'common-ui';
 import { ThemedView } from '@/components/ThemedView';
 import AppContainer from '@/components/app-container';
 import AddBusinessUserForm from '@/components/add-business-user-form';
-import { ROLE_NAMES } from '@common_ui';
 import { useAuth } from '@/components/context/auth-context';
 
 export default function AddDoctorScreen() {

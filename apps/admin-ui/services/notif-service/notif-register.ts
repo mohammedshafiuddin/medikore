@@ -2,7 +2,7 @@ import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
-import { NOTIF_PERMISSION_DENIED } from "@common_ui/src/lib/const-strs";
+import { NOTIF_PERMISSION_DENIED } from "common-ui/src/lib/const-strs";
 
 export async function registerForPushNotificationsAsync() {
   if (Platform.OS === "android") {

@@ -6,8 +6,8 @@ import {
 } from "react-native-paper";
 import { View, Text, StyleSheet } from "react-native";
 import MyText from "./text";
-import { colors } from "@common_ui";
-import { useTheme } from "@common_ui";
+import { colors } from "common-ui";
+import { useTheme } from "common-ui";
 
 type MyTextInputProps = TextInputProps & {
   topLabel?: string;

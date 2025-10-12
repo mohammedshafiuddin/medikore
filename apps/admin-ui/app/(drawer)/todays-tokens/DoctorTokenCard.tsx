@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { View, Alert, TextInput } from 'react-native';
-import { MyText } from "@common_ui";
-import { DoctorTodayToken } from '@common_ui/shared-types';
-import { tw } from '@common_ui';
+import { MyText , tw } from "common-ui";
+import { DoctorTodayToken } from 'common-ui/shared-types';
 import { Ionicons } from '@expo/vector-icons';
 import { useUpdateTokenStatus } from '@/api-hooks/token.api';
 import { LinearGradient } from 'expo-linear-gradient';

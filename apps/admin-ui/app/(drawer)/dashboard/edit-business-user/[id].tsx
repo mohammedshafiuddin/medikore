@@ -1,7 +1,6 @@
-import { MyText } from "@common_ui";
+import { MyText , tw } from "common-ui";
 import React from 'react';
 import { ScrollView, View, ActivityIndicator } from 'react-native';
-import { tw } from '@common_ui';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AddBusinessUserForm from '@/components/add-business-user-form';
 import { useGetUserById } from '@/api-hooks/user.api';

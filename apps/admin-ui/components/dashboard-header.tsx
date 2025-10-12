@@ -1,12 +1,10 @@
 import React from 'react';
 import { View, TouchableOpacity, Animated, Easing } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MyText } from "@common_ui";
-import { tw } from '@common_ui';
+import { MyText , tw , colors } from "common-ui";
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { IconButton } from 'react-native-paper';
-import { colors } from '@common_ui';
 
 interface DashboardHeaderProps {
   onMenuPress: () => void;

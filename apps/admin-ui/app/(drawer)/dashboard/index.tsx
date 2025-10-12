@@ -1,12 +1,10 @@
 import React from 'react'
 import { View, ActivityIndicator } from 'react-native'
-import { tw } from "@common_ui";
+import { tw , MyText , ROLE_NAMES } from "common-ui";
 import DoctorDashboard from '@/components/doctor-dashboard'
 import { useThemeColor } from '@/hooks/useThemeColor'
-import { MyText } from "@common_ui";
 import { ThemedView } from '@/components/ThemedView'
 import { useRoles } from '@/components/context/roles-context'
-import { ROLE_NAMES } from '@common_ui'
 import useHideDrawerHeader from '@/hooks/useHideDrawerHeader'
 import HospitalAdminDashboard from '@/components/hospital-admin-dashboard'
 import { useAuth } from '@/components/context/auth-context'

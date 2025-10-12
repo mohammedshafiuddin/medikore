@@ -1,7 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { MyText } from "@common_ui";
-import { tw } from '@common_ui';
+import { MyText , tw } from "common-ui";
 import { Ionicons } from '@expo/vector-icons';
 
 // Define the types

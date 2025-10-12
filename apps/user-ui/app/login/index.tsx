@@ -8,9 +8,9 @@ import { useLogin, LoginResponse } from "@/api-hooks/auth.api";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 
 import { Link } from "expo-router";
-import { MyButton } from "@common_ui";
-import { MyText } from "@common_ui";
-import { Checkbox, BottomDialog } from "@common_ui";
+import { MyButton } from "common-ui";
+import { MyText } from "common-ui";
+import { Checkbox, BottomDialog } from "common-ui";
 import { StorageService } from "@/lib/StorageService";
 
 interface LoginFormInputs {

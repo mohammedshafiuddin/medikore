@@ -1,9 +1,9 @@
-import { MyText } from '@common_ui';
+import { MyText } from 'common-ui';
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import tw from '@/app/tailwind';
 import HospitalForm from '@/components/hospital-form';
-import { AppContainer } from '@common_ui';
+import { AppContainer } from 'common-ui';
 import { MaterialIcons } from '@expo/vector-icons';
 
 function AddHospital() {

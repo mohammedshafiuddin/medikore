@@ -6,8 +6,8 @@
       "@/*": [
         "./*"
       ],
-      "@common_ui": ["../../packages/ui"],
-      "@common_ui/*": ["../../packages/ui/*"]
+      "common-ui": ["../../packages/ui"],
+      "common-ui/*": ["../../packages/ui/*"]
     }
   },
   "include": [

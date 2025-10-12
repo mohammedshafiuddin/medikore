@@ -2,8 +2,7 @@ import HospitalForm, { initialHospitalValues } from "@/components/hospital-form"
 import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import { ScrollView, View } from "react-native";
-import { tw } from "@common_ui";
-import { MyText } from "@common_ui";
+import { tw , MyText } from "common-ui";
 import AppContainer from "@/components/app-container";
 import { MaterialIcons } from '@expo/vector-icons';
 

@@ -26,6 +26,7 @@ import {
   gte,
   sql,
   like,
+  desc,
 } from "drizzle-orm";
 import { ApiError } from "../lib/api-error";
 import jwt from "jsonwebtoken";
@@ -179,6 +180,8 @@ export const login = async (
     throw new ApiError("Missing credentials", 400);
   }
 
+  console.log({useUsername})
+  
   // Find user based on login method
   let user;
   let mobileRecord;
@@ -220,10 +223,15 @@ export const login = async (
     throw new ApiError("Account has been suspended", 403);
   }
 
+  let passwordToCompare = mobileRecord?.password;
+  if(useUsername) {
+    passwordToCompare = user.userInfo.password;
+  }
+
   // Verify password
   const isPasswordValid = await bcrypt.compare(
     password,
-    mobileRecord?.password || ''
+    passwordToCompare || ''
   );
   if (!isPasswordValid) {
     throw new ApiError("Invalid credentials", 401);
@@ -1415,4 +1423,107 @@ export const searchUsersByMobile = async (
     .where(eq(mobileNumbersTable.mobile, mobileQuery));
 
   return res.status(200).json({ users: users });
+};
+
+/**
+ * Get patient details by patient ID
+ */
+export const getPatientDetails = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const patientId = parseInt(req.params.patientId);
+
+  if (isNaN(patientId)) {
+    throw new ApiError("Invalid patient ID", 400);
+  }
+
+  // Get requesting user's hospital (must be hospital admin)
+  const requestingUserId = req.user?.userId;
+  if (!requestingUserId) {
+    throw new ApiError("User not authenticated", 401);
+  }
+
+  const hospitalEmployee = await db.query.hospitalEmployeesTable.findFirst({
+    where: and(
+      eq(hospitalEmployeesTable.userId, requestingUserId),
+      eq(hospitalEmployeesTable.designation, DESIGNATIONS.HOSPITAL_ADMIN)
+    )
+  });
+
+  if (!hospitalEmployee) {
+    throw new ApiError("Access denied: User is not a hospital admin", 403);
+  }
+
+  const adminHospitalId = hospitalEmployee.hospitalId;
+
+  // Get patient basic info with userInfo
+  const patient = await db.query.usersTable.findFirst({
+    where: eq(usersTable.id, patientId),
+    with: {
+      userInfo: true,
+      roles: {
+        with: {
+          role: true
+        }
+      }
+    }
+  });
+
+  if (!patient) {
+    throw new ApiError("Patient not found", 404);
+  }
+
+  // Check if user is a general user (patient)
+  const isGeneralUser = patient.roles.some(r => r.role.name === ROLE_NAMES.GENERAL_USER);
+  if (!isGeneralUser) {
+    throw new ApiError("User is not a patient", 400);
+  }
+
+  // Get consultation history with doctor details, filtered by hospital
+  const consultations = await db
+    .select({
+      id: tokenInfoTable.id,
+      tokenDate: tokenInfoTable.tokenDate,
+      doctorId: tokenInfoTable.doctorId,
+      consultationNotes: tokenInfoTable.consultationNotes,
+      doctor: {
+        name: usersTable.name
+      }
+    })
+    .from(tokenInfoTable)
+    .innerJoin(usersTable, eq(tokenInfoTable.doctorId, usersTable.id))
+    .innerJoin(
+      hospitalEmployeesTable,
+      and(
+        eq(usersTable.id, hospitalEmployeesTable.userId),
+        eq(hospitalEmployeesTable.hospitalId, adminHospitalId)
+      )
+    )
+    .where(eq(tokenInfoTable.userId, patientId))
+    .orderBy(desc(tokenInfoTable.tokenDate));
+
+  // Format consultation history
+  const consultationHistory = consultations.map(consultation => ({
+    date: consultation.tokenDate,
+    doctorDetails: {
+      id: consultation.doctorId.toString(),
+      name: consultation.doctor.name || 'Unknown Doctor'
+    },
+    notes: consultation.consultationNotes || 'No notes available'
+  }));
+
+  // Get last consultation date
+  const lastConsultation = consultationHistory.length > 0 ? consultationHistory[0].date : null;
+
+  const response = {
+    name: patient.name,
+    age: patient.userInfo?.age || null,
+    gender: patient.userInfo?.gender || null,
+    last_consultation: lastConsultation,
+    consultationHistory
+  };
+
+  return res.status(200).json(response);
 };

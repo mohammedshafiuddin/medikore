@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "@/services/axios";
-import { Doctor, DoctorSpecialization as Specialization } from "@common_ui/shared-types";
+import { Doctor, DoctorSpecialization as Specialization } from "common-ui/shared-types";
 
 export interface GetDoctorsResponse {
   doctors: Doctor[];

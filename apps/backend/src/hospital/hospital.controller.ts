@@ -13,7 +13,7 @@ import { eq, and, sql } from "drizzle-orm";
 import { DESIGNATIONS } from "../lib/const-strings";
 import { imageUploadS3, generateSignedUrlsFromS3Urls, getOriginalUrlFromSignedUrl } from "../lib/s3-client";
 import { ApiError } from "../lib/api-error";
-import { DoctorSpecialization } from "shared-types";
+import { DoctorSpecialization } from "@commonTypes";
 
 /**
  * Create a new hospital

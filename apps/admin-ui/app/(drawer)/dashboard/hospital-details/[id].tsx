@@ -1,15 +1,11 @@
 import React from 'react';
 import { ScrollView, View, Dimensions, TouchableOpacity, Image } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-import { tw } from '@common_ui';
+import { useLocalSearchParams , useRouter } from 'expo-router';
+import { tw , MyText , MyButton , ImageCarousel } from 'common-ui';
 import { ThemedView } from '@/components/ThemedView';
-import { MyText } from "@common_ui";
-import { MyButton } from '@common_ui';
-import { useRouter } from 'expo-router';
 import useHideDrawerHeader from '@/hooks/useHideDrawerHeader';
 import { useGetHospitalById, useGetHospitalDoctors } from '@/api-hooks/hospital.api';
 import { Ionicons } from '@expo/vector-icons';
-import { ImageCarousel } from "@common_ui";
 import type { Hospital, DoctorSpecialization } from 'shared-types';
 
 interface HospitalWithDetails extends Hospital {

@@ -3,8 +3,8 @@ import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import { ScrollView, View } from "react-native";
 import tw from "@/app/tailwind";
-import { MyText } from "@common_ui";
-import { AppContainer } from "@common_ui";
+import { MyText } from "common-ui";
+import { AppContainer } from "common-ui";
 import { MaterialIcons } from '@expo/vector-icons';
 
 function EditHospital() {

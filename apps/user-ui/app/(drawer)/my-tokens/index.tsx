@@ -2,14 +2,14 @@ import React from 'react';
 import { View, ScrollView, ActivityIndicator, TouchableOpacity, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import tw from '@/app/tailwind';
-import { MyText } from '@common_ui';
+import { MyText } from 'common-ui';
 import { ThemedView } from '@/components/ThemedView';
 import { useRoles } from '@/components/context/roles-context';
 import { ROLE_NAMES } from '@/lib/constants';
 import { useMyUpcomingTokens, usePastTokens } from '@/api-hooks/token.api';
 import { UpcomingToken, PastToken } from '../../../../shared-types';
 import { Ionicons } from '@expo/vector-icons';
-import { AppContainer } from '@common_ui';
+import { AppContainer } from 'common-ui';
 
 export default function MyTokensScreen() {
   const roles = useRoles();

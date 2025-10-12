@@ -1,8 +1,8 @@
 import React from 'react';
 import { Text as PaperText } from 'react-native-paper';
 import { TextProps as RNTextProps } from 'react-native';
-import { useTheme } from "@common_ui";
-import type { Theme } from "@common_ui";
+import { useTheme } from "common-ui";
+import type { Theme } from "common-ui";
 // import { useTheme } from '../hooks/theme-context';
 
 // All color keys from theme.colors

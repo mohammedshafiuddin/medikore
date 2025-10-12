@@ -1,7 +1,7 @@
 import React, { ReactNode, useState } from 'react';
 import { Modal, View, TouchableOpacity, StyleSheet, Animated, Easing, Dimensions, TextInput } from 'react-native';
 import MyText from './text';
-import { MyButton } from '@common_ui';
+import { MyButton } from 'common-ui';
 
 interface DialogProps {
   open: boolean;

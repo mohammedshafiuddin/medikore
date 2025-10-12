@@ -1,6 +1,6 @@
 import tw from "../lib/tailwind";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 
 export interface DropdownOption {
@@ -17,6 +17,7 @@ interface Props {
   style?: any;
   placeholder?: string;
   disabled?: boolean;
+  className?: string;
 }
 
 const CustomDropdown: React.FC<Props> = ({
@@ -28,27 +29,38 @@ const CustomDropdown: React.FC<Props> = ({
   style,
   placeholder,
   disabled,
+  className,
 }) => {
   return (
-    <View style={[styles.container, style]}>
+    <View style={[tw``, style]}>
       <Dropdown
         data={options}
         labelField="label"
         valueField="value"
         value={value}
         onChange={(item) => onValueChange(item.value)}
-        placeholder={placeholder || label}
+        placeholder={placeholder ?? label}
         placeholderStyle={[tw`text-gray-500`, disabled && tw`text-gray-400`]}
-        style={[styles.dropdown, error && styles.error, disabled && styles.disabled]}
+        style={[
+          tw`border rounded-md px-3 py-2 bg-white`,
+          error ? tw`border-red-500` : tw`border-gray-300`,
+          disabled && tw`bg-gray-100 border-gray-200`,
+          tw`${className || ''}`,
+        ]}
         disable={disabled}
         renderItem={(item: DropdownOption) => {
           const isSelected = value === item.value;
           return (
-            <View style={[styles.item, isSelected && styles.selectedItem]}>
+            <View
+              style={[
+                tw`px-3 py-2 rounded-md my-1`,
+                isSelected ? tw`bg-blue-50` : tw`bg-white`,
+              ]}
+            >
               <Text
                 style={[
-                  isSelected ? styles.selectedTextStyle : styles.itemTextStyle,
-                  disabled && tw`text-gray-400`
+                  isSelected ? tw`text-blue-800 font-semibold` : tw`text-gray-800`,
+                  disabled && tw`text-gray-400`,
                 ]}
               >
                 {item.label}
@@ -56,49 +68,13 @@ const CustomDropdown: React.FC<Props> = ({
             </View>
           );
         }}
-        selectedTextStyle={disabled ? tw`text-gray-400` : undefined}
+        selectedTextStyle={disabled ? tw`text-gray-400` : tw`text-gray-800 font-medium`}
+        // the dropdown's listProps / containerProps can be tuned if needed:
+        // dropdownStyle etc. Example:
+        // dropdownStyle={tw`bg-white`}
       />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 16,
-  },
-  dropdown: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: "#fff",
-  },
-  disabled: {
-    backgroundColor: "#f5f5f5",
-    borderColor: "#d3d3d3",
-  },
-  error: {
-    borderColor: "red",
-  },
-    item: {
-    padding: 10,
-    borderRadius: 6,
-    backgroundColor: '#fff',
-    marginVertical: 2,
-  },
-  selectedItem: {
-    backgroundColor: '#e0f0ff', // Light blue for selected
-  },
-    selectedTextStyle: {
-    color: '#333',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  itemTextStyle: {
-    color: '#333',
-    fontSize: 16,
-  },
-});
 
 export default CustomDropdown;

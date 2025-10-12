@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, ScrollView } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
-import { MyText } from '@common_ui';
+import { MyText } from 'common-ui';
 import tw from '@/app/tailwind';
 import { Ionicons } from '@expo/vector-icons';
 import DayAccountView, { DayAccountData } from '@/components/day-account-view';
-import { AppContainer } from '@common_ui';
+import { AppContainer } from 'common-ui';
 
 // Generate mock data for the last 12 days
 const generateMockData = () => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
-import { MyText, tw } from '@common_ui';
+import { MyText, tw } from 'common-ui';
 import { useRouter } from 'expo-router';
 
 interface ViewDoctorProfileLinkProps {

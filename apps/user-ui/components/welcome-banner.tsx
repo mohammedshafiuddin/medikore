@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MyText } from '@common_ui';
+import { MyText } from 'common-ui';
 import tw from '@/app/tailwind';
 
 interface WelcomeBannerProps {

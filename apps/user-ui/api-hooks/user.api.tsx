@@ -1,7 +1,7 @@
 import axios from "@/services/axios";
 import { useQuery, useMutation, QueryClient, useQueryClient } from "@tanstack/react-query";
-import type { User, UpcomingAppointment } from "@common_ui/shared-types";
-import { DoctorDetails } from "@common_ui/shared-types";
+import type { User, UpcomingAppointment } from "common-ui/shared-types";
+import { DoctorDetails } from "common-ui/shared-types";
 
 
 export interface CreateUserPayload {
@@ -217,6 +217,32 @@ export function useAddPushToken() {
   return useMutation({
     mutationFn: async (pushToken: string) => {
       const res = await axios.post('/users/push-token', { pushToken });
+      return res.data;
+    },
+  });
+}
+
+export interface PatientDetails {
+  name: string;
+  age: number;
+  gender: string;
+  last_consultation: string;
+  consultationHistory: Array<{
+    date: string;
+    doctorDetails: {
+      id: string;
+      name: string;
+    };
+    notes: string;
+  }>;
+}
+
+export function useGetPatientDetails(patientId: number | string | undefined | null) {
+  return useQuery<PatientDetails | undefined>({
+    queryKey: ['patient-details', patientId],
+    enabled: Boolean(patientId),
+    queryFn: async () => {
+      const res = await axios.get<PatientDetails>(`/users/patient-details/${patientId}`);
       return res.data;
     },
   });

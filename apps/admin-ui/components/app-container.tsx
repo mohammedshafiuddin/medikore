@@ -1,3 +1,3 @@
-import { AppContainer } from "@common_ui";
+import { AppContainer } from "common-ui";
 
 export default AppContainer;

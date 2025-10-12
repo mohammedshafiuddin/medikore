@@ -1,7 +1,7 @@
 import React from "react";
 import { Button as PaperButton, ButtonProps } from "react-native-paper";
 // import { useTheme } from "../hooks/theme-context";
-import { useTheme } from "@common_ui";
+import { useTheme } from "common-ui";
 import { TouchableOpacity } from "react-native";
 import MyText from "./text"; // Updated import path
 

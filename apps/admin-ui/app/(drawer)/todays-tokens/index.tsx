@@ -7,10 +7,9 @@ import {
   TouchableOpacity,
 } from "react-native";
 import AppContainer from "@/components/app-container";
-import { BottomDropdown, MyText, SearchBar } from "@common_ui";
+import { BottomDropdown, MyText, SearchBar , tw } from "common-ui";
 import { useDoctorTodaysTokens, useSearchDoctorTokens } from "@/api-hooks/token.api";
-import { DoctorTodayToken } from "@common_ui/shared-types";
-import { tw } from "@common_ui";
+import { DoctorTodayToken } from "common-ui/shared-types";
 import { Ionicons } from "@expo/vector-icons";
 import DoctorTokenCard from "./DoctorTokenCard";
 import { LinearGradient } from "expo-linear-gradient";

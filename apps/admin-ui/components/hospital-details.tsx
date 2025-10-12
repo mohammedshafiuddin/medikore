@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { MyText } from "@common_ui";
-import { tw } from '@common_ui';
+import { MyText , tw } from "common-ui";
 import { ThemedView } from './ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { Ionicons } from '@expo/vector-icons';

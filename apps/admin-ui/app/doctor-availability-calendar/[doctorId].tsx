@@ -8,13 +8,10 @@ import {
   TextInput,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { tw } from "@common_ui";
-import { MyText } from "@common_ui";
-import { MyButton } from "@common_ui";
+import { tw , MyText , MyButton , Checkbox } from "common-ui";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useGetDoctorAvailabilityForNextDays, useUpdateDoctorAvailability } from "@/api-hooks/token.api";
 import AppContainer from "@/components/app-container";
-import { Checkbox } from "@common_ui";
 import { SuccessToast } from "@/services/toaster";
 import dayjs from "dayjs";
 

@@ -210,6 +210,47 @@ export interface token_user {
   gender: string;
 }
 
+// Patient History Types
+export interface PatientHistoryToken {
+  id: number;
+  queueNum: number;
+  tokenDate: string;
+  doctorName: string;
+  status: string;
+  description: string;
+  consultationNotes?: string;
+}
+
+export interface PatientHistory {
+  id: number;
+  name: string;
+  mobile: string;
+  age: number;
+  gender: string;
+  totalTokens: number;
+  completedTokens: number;
+  upcomingTokens: number;
+  firstVisitDate: string;
+  lastVisitDate: string;
+  tokens: PatientHistoryToken[];
+}
+
+export interface GetHospitalPatientHistoryResponse {
+  message: string;
+  patients: PatientHistory[];
+  totalCount: number;
+  page: number;
+  limit: number;
+}
+
+export interface PatientHistoryFilters {
+  patientIds?: string[];
+  doctorIds?: string[];
+  statuses?: string[];
+  startDate?: string | null;
+  endDate?: string | null;
+}
+
 
 // Export the types from token-types.ts
 export * from './token-types';

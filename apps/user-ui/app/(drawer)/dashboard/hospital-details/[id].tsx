@@ -3,13 +3,13 @@ import { ScrollView, View, Dimensions, TouchableOpacity, Image } from 'react-nat
 import { useLocalSearchParams } from 'expo-router';
 import tw from '@/app/tailwind';
 import { ThemedView } from '@/components/ThemedView';
-import { MyText } from '@common_ui';
-import { MyButton } from '@common_ui';
+import { MyText } from 'common-ui';
+import { MyButton } from 'common-ui';
 import { useRouter } from 'expo-router';
 import useHideDrawerHeader from '@/hooks/useHideDrawerHeader';
 import { useGetHospitalById, useGetHospitalDoctors } from '@/api-hooks/hospital.api';
 import { Ionicons } from '@expo/vector-icons';
-import { ImageCarousel } from '@common_ui';
+import { ImageCarousel } from 'common-ui';
 import type { Hospital, DoctorSpecialization } from 'shared-types';
 
 interface HospitalWithDetails extends Hospital {

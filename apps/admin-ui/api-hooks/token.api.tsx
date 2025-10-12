@@ -13,8 +13,10 @@ import {
   PastTokensResponse,
   HospitalTodaysTokensResponse,
   DoctorTodaysTokensResponse,
-  DoctorTodayToken
-} from "@common_ui/shared-types";
+  DoctorTodayToken,
+  GetHospitalPatientHistoryResponse,
+  PatientHistoryFilters
+} from "common-ui/shared-types";
 
 interface SingleDoctorAvailabilityResponse {
   message: string;
@@ -341,7 +343,30 @@ export const useGetHospitalTokenHistory = (
       }
 
       const response = await axios.get(
-        `/tokens/history?${params.toString()}`
+        `/tokens/patients/history?${params.toString()}`
+      );
+      return response.data;
+    },
+  });
+};
+
+
+
+/**\n * Hook to fetch patient history for a hospital (hospital admin view)\n * @param page The current page number (1-indexed)\n * @param limit The number of items per page\n */
+export const useGetHospitalPatientHistory = (
+  page: number,
+  limit: number
+) => {
+  return useQuery<GetHospitalPatientHistoryResponse>({
+    queryKey: ["hospitalPatientHistory", page, limit],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+      });
+
+      const response = await axios.get(
+        `/tokens/patients/history?${params.toString()}`
       );
       return response.data;
     },

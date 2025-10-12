@@ -29,8 +29,8 @@ import { IconButton } from "react-native-paper";
 import { colors } from "@/lib/theme-colors";
 import tw from "../tailwind";
 import { useTheme } from "../hooks/theme.context";
-import { MyText } from "@common_ui";
-import { MyButton } from "@common_ui";
+import { MyText } from "common-ui";
+import { MyButton } from "common-ui";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRoles } from "@/components/context/roles-context";
 import { useAuth } from "@/components/context/auth-context";
@@ -48,8 +48,6 @@ function _layout(props: Props) {
   const { theme } = useTheme();
 
   const roles = useRoles();
-  const isAdmin = roles?.includes("admin");
-  const isGenUser = roles?.includes(ROLE_NAMES.GENERAL_USER);
   const isHospitalAdmin = roles?.includes(ROLE_NAMES.HOSPITAL_ADMIN);
   const router = useRouter();
 
@@ -75,21 +73,23 @@ function _layout(props: Props) {
 
   return (
     <View style={{ flexGrow: 1, backgroundColor: theme.colors.gray3 }}>
-              <Drawer
-          drawerContent={(props) => <CustomDrawerContent {...props} />}
-          screenOptions={({ navigation }) => ({
-            headerShown: true,
-            header: () => (
-              <DashboardHeader
-                onMenuPress={() => navigation.toggleDrawer()}
-                onNotificationsPress={() => router.push("/(drawer)/notifications" as any)}
-                onProfilePress={() => router.push("/(drawer)/my-profile" as any)}
-                onRefreshPress={handleRefersh}
-                refreshing={spinning}
-              />
-            ),
-          })}
-        >
+      <Drawer
+        drawerContent={(props) => <CustomDrawerContent {...props} />}
+        screenOptions={({ navigation }) => ({
+          headerShown: true,
+          header: () => (
+            <DashboardHeader
+              onMenuPress={() => navigation.toggleDrawer()}
+              onNotificationsPress={() =>
+                router.push("/(drawer)/notifications" as any)
+              }
+              onProfilePress={() => router.push("/(drawer)/my-profile" as any)}
+              onRefreshPress={handleRefersh}
+              refreshing={spinning}
+            />
+          ),
+        })}
+      >
         <Drawer.Screen
           name="index"
           options={{
@@ -299,6 +299,7 @@ function CustomDrawerContent(props: any) {
     "payment-failed",
     "appointments",
     "index",
+    "patient-details",
   ];
   const adminOnlyRoutes = ["admin-panel"];
   const genUserOnlyRoutes = ["my-tokens"];
@@ -328,7 +329,7 @@ function CustomDrawerContent(props: any) {
       >
         {/* User Profile Section */}
         {user && (
-          <View 
+          <View
             style={{
               flexDirection: "row",
               alignItems: "center",
@@ -372,7 +373,11 @@ function CustomDrawerContent(props: any) {
               </View>
             )}
             <View>
-              <MyText weight="bold" color="white1" style={{ fontSize: 18, marginBottom: 4 }}>
+              <MyText
+                weight="bold"
+                color="white1"
+                style={{ fontSize: 18, marginBottom: 4 }}
+              >
                 {user.name}
               </MyText>
               <MyText color="white1" style={{ fontSize: 14, opacity: 0.9 }}>
@@ -381,7 +386,7 @@ function CustomDrawerContent(props: any) {
             </View>
           </View>
         )}
-        
+
         {/* Navigation Items */}
         <View style={{ paddingHorizontal: 8 }}>
           {props.state.routes.map((route: any, index: any) => {
@@ -391,7 +396,8 @@ function CustomDrawerContent(props: any) {
               hiddenRoutes.includes(route.name) ||
               (!isAdmin && adminOnlyRoutes.includes(route.name)) ||
               (genUserOnlyRoutes.includes(route.name) && !isGenUser) ||
-              (hostpitalAdminOnlyRoutes.includes(route.name) && !isHospitalAdmin)
+              (hostpitalAdminOnlyRoutes.includes(route.name) &&
+                !isHospitalAdmin)
             ) {
               return null;
             }
@@ -470,7 +476,13 @@ function CustomDrawerContent(props: any) {
             {myDoctors.map((doctor) => (
               <DrawerItem
                 key={`doctor-${doctor.id}`}
-                label={({ focused, color }: { focused: boolean; color: string }) => (
+                label={({
+                  focused,
+                  color,
+                }: {
+                  focused: boolean;
+                  color: string;
+                }) => (
                   <View
                     style={{
                       flex: 1,
@@ -479,7 +491,9 @@ function CustomDrawerContent(props: any) {
                       justifyContent: "space-between",
                     }}
                   >
-                    <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
                       <MaterialIcons
                         name="person"
                         color={theme.colors.blue1}
@@ -519,7 +533,7 @@ function CustomDrawerContent(props: any) {
           </View>
         )}
       </DrawerContentScrollView>
-      
+
       {/* Logout Button */}
       <View
         style={{
@@ -531,7 +545,7 @@ function CustomDrawerContent(props: any) {
       >
         <MyButton
           onPress={() => logout({})}
-          style={{ 
+          style={{
             backgroundColor: colors.red1,
             borderRadius: 8,
             paddingVertical: 8,

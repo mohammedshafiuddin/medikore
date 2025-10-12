@@ -1,14 +1,35 @@
-import React, { useState, useMemo } from 'react';
-import { View, ScrollView, ActivityIndicator, TouchableOpacity, Platform, FlatList } from 'react-native';
-import { MyText, tw, BottomDialog, SearchBar, MultiSelectDropdown, DatePicker, MyTextInput } from '@common_ui';
-import AppContainer from '@/components/app-container';
-import { ThemedView } from '@/components/ThemedView';
-import { useGetHospitalTokenHistory, TokenHistoryFilters } from '@/api-hooks/token.api';
-import { useGetMyDoctors } from '@/api-hooks/my-doctors.api';
-import { useSearchUserByMobile } from '@/api-hooks/user.api';
-import { Ionicons } from '@expo/vector-icons';
-import TokenHistoryWebView from '@/components/TokenHistoryWebView';
-import TokenHistoryCard from '@/components/TokenHistoryCard';
+import React, { useState, useMemo } from "react";
+import {
+  View,
+  ScrollView,
+  ActivityIndicator,
+  TouchableOpacity,
+  Platform,
+  FlatList,
+} from "react-native";
+import {
+  MyText,
+  tw,
+  BottomDialog,
+  SearchBar,
+  MultiSelectDropdown,
+  DatePicker,
+  MyTextInput,
+} from "common-ui";
+import AppContainer from "@/components/app-container";
+import { ThemedView } from "@/components/ThemedView";
+import {
+  useGetHospitalTokenHistory,
+  TokenHistoryFilters,
+} from "@/api-hooks/token.api";
+import { useGetMyDoctors } from "@/api-hooks/my-doctors.api";
+import { useSearchUserByMobile } from "@/api-hooks/user.api";
+import { Ionicons } from "@expo/vector-icons";
+import TokenHistoryWebView from "@/components/TokenHistoryWebView";
+import TokenHistoryCard from "@/components/TokenHistoryCard";
+import PaginationComponent from "@/components/Pagination";
+import PaperPagination from "@/components/paper-pagination";
+import TokenHistory from "@/components/tokenhistory";
 
 export default function TokenHistoryScreen() {
   const [page, setPage] = useState(1); // Use 1-based indexing for API
@@ -17,44 +38,50 @@ export default function TokenHistoryScreen() {
   const [itemsPerPage, onItemsPerPageChange] = useState(
     numberOfItemsPerPageList[0]
   );
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [isFilterVisible, setFilterVisible] = useState(false);
-  
+
   // Staged filter states (for the dialog)
   const [selectedDoctorIds, setSelectedDoctorIds] = useState<string[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
-  const [patientMobile, setPatientMobile] = useState('');
+  const [patientMobile, setPatientMobile] = useState("");
   const [selectedPatientIds, setSelectedPatientIds] = useState<string[]>([]);
 
   // Active filter state (for the API call)
   const [activeFilters, setActiveFilters] = useState<TokenHistoryFilters>({});
 
+  const { data: doctors, isLoading: isLoadingDoctors } = useGetMyDoctors({
+    enabled: isFilterVisible,
+  });
+  const { data: patients, isLoading: patientsLoading } =
+    useSearchUserByMobile(patientMobile);
 
-  const { data: doctors, isLoading: isLoadingDoctors } = useGetMyDoctors({ enabled: isFilterVisible });
-  const { data: patients, isLoading: patientsLoading } = useSearchUserByMobile(patientMobile);
-
+  const [paginationModel, setPaginationModel] = useState({currentPage: 1, pageSize: 10})
   const statusOptions = [
-    { label: 'Upcoming', value: 'UPCOMING' },
-    { label: 'In Progress', value: 'IN_PROGRESS' },
-    { label: 'Completed', value: 'COMPLETED' },
-    { label: 'Missed', value: 'MISSED' },
-    { label: 'Cancelled', value: 'CANCELLED' },
+    { label: "Upcoming", value: "UPCOMING" },
+    { label: "In Progress", value: "IN_PROGRESS" },
+    { label: "Completed", value: "COMPLETED" },
+    { label: "Missed", value: "MISSED" },
+    { label: "Cancelled", value: "CANCELLED" },
   ];
 
   const patientOptions = useMemo(() => {
-    return (patients || []).map(p => ({
+    return (patients || []).map((p) => ({
       label: `${p.name} (${p.age})`,
       value: p.id.toString(),
     }));
   }, [patients]);
 
-  const { data, isLoading, isError, error } = useGetHospitalTokenHistory(page, itemsPerPage, activeFilters);
-  console.log({ error });
-  
+  const { data, isLoading, isError, error } = useGetHospitalTokenHistory(
+    page,
+    itemsPerPage,
+    activeFilters
+  );
+
   const doctorOptions = useMemo(() => {
-    return (doctors || []).map(doc => ({
+    return (doctors || []).map((doc) => ({
       label: `Dr. ${doc.name}`,
       value: doc.id.toString(),
     }));
@@ -69,9 +96,11 @@ export default function TokenHistoryScreen() {
         setAllTokens(data.tokens); // Reset list for first page
       } else {
         // Append for subsequent pages, avoiding duplicates
-        setAllTokens(prevTokens => {
-          const existingIds = new Set(prevTokens.map(t => t.id));
-          const uniqueNewTokens = data.tokens.filter(t => !existingIds.has(t.id));
+        setAllTokens((prevTokens) => {
+          const existingIds = new Set(prevTokens.map((t) => t.id));
+          const uniqueNewTokens = data.tokens.filter(
+            (t) => !existingIds.has(t.id)
+          );
           return [...prevTokens, ...uniqueNewTokens];
         });
       }
@@ -90,7 +119,7 @@ export default function TokenHistoryScreen() {
 
   const handleLoadMore = () => {
     if (!isLoading && allTokens.length < totalCount) {
-      setPage(prevPage => prevPage + 1);
+      setPage((prevPage) => prevPage + 1);
     }
   };
 
@@ -126,7 +155,9 @@ export default function TokenHistoryScreen() {
     <AppContainer>
       <ThemedView style={tw`flex-1`}>
         <View style={tw``}>
-          <MyText style={tw`text-2xl font-bold text-gray-800 dark:text-white mb-4`}>
+          <MyText
+            style={tw`text-2xl font-bold text-gray-800 dark:text-white mb-4`}
+          >
             Token History
           </MyText>
           <View style={tw`flex-row items-center mb-4`}>
@@ -140,13 +171,19 @@ export default function TokenHistoryScreen() {
                 placeholder="Search by name, status..."
               />
             </View>
-            <TouchableOpacity onPress={() => setFilterVisible(true)} style={tw`p-2 ml-2`}>
-              <Ionicons name="filter" size={24} color={tw.color('gray-600')} />
+            <TouchableOpacity
+              onPress={() => setFilterVisible(true)}
+              style={tw`p-2 ml-2`}
+            >
+              <Ionicons name="filter" size={24} color={tw.color("gray-600")} />
             </TouchableOpacity>
           </View>
         </View>
 
-        <BottomDialog open={isFilterVisible} onClose={() => setFilterVisible(false)}>
+        <BottomDialog
+          open={isFilterVisible}
+          onClose={() => setFilterVisible(false)}
+        >
           <View style={tw``}>
             <MyText style={tw`text-lg font-bold mb-4`}>Filter Options</MyText>
 
@@ -162,7 +199,9 @@ export default function TokenHistoryScreen() {
               />
             )}
 
-            <MyText style={tw`text-base font-semibold mt-4 mb-2`}>By Date</MyText>
+            <MyText style={tw`text-base font-semibold mt-4 mb-2`}>
+              By Date
+            </MyText>
             <View style={tw`flex-row justify-between`}>
               <View style={tw`w-[48%]`}>
                 <DatePicker
@@ -180,7 +219,9 @@ export default function TokenHistoryScreen() {
               </View>
             </View>
 
-            <MyText style={tw`text-base font-semibold mt-4 mb-2`}>By Status</MyText>
+            <MyText style={tw`text-base font-semibold mt-4 mb-2`}>
+              By Status
+            </MyText>
             <MultiSelectDropdown
               data={statusOptions}
               value={selectedStatuses}
@@ -188,7 +229,9 @@ export default function TokenHistoryScreen() {
               placeholder="Select statuses"
             />
 
-            <MyText style={tw`text-base font-semibold mt-4 mb-2`}>By Patient</MyText>
+            <MyText style={tw`text-base font-semibold mt-4 mb-2`}>
+              By Patient
+            </MyText>
             <MyTextInput
               placeholder="Enter 10-digit mobile to search"
               keyboardType="phone-pad"
@@ -208,7 +251,9 @@ export default function TokenHistoryScreen() {
               </View>
             )}
 
-            <View style={tw`flex-row justify-end border-t border-gray-200 pt-4 mt-auto`}>
+            <View
+              style={tw`flex-row justify-end border-t border-gray-200 pt-4 mt-auto`}
+            >
               <TouchableOpacity
                 onPress={() => {
                   // Clear staged filters
@@ -216,7 +261,7 @@ export default function TokenHistoryScreen() {
                   setStartDate(null);
                   setEndDate(null);
                   setSelectedStatuses([]);
-                  setPatientMobile('');
+                  setPatientMobile("");
                   setSelectedPatientIds([]);
                   // Also clear active filters
                   setActiveFilters({});
@@ -232,8 +277,12 @@ export default function TokenHistoryScreen() {
                     doctorIds: selectedDoctorIds,
                     patientIds: selectedPatientIds,
                     statuses: selectedStatuses,
-                    startDate: startDate ? startDate.toISOString().split('T')[0] : null,
-                    endDate: endDate ? endDate.toISOString().split('T')[0] : null,
+                    startDate: startDate
+                      ? startDate.toISOString().split("T")[0]
+                      : null,
+                    endDate: endDate
+                      ? endDate.toISOString().split("T")[0]
+                      : null,
                   };
                   setActiveFilters(newFilters);
                   setFilterVisible(false);
@@ -245,44 +294,8 @@ export default function TokenHistoryScreen() {
             </View>
           </View>
         </BottomDialog>
-
-        {Platform.OS === 'web' ? (
-          <TokenHistoryWebView
-            tokens={data?.tokens || []} // Pass single page of tokens
-            page={page - 1} // API is 1-based, component is 0-based
-            totalCount={totalCount}
-            itemsPerPage={itemsPerPage}
-            onPageChange={(p) => setPage(p + 1)} // Adjust for 1-based API
-            numberOfItemsPerPageList={numberOfItemsPerPageList}
-            onItemsPerPageChange={onItemsPerPageChange}
-            from={from}
-            to={to}
-          />
-        ) : (
-          <FlatList
-            data={allTokens}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => <TokenHistoryCard token={item} />}
-            contentContainerStyle={tw`p-4`}
-            onEndReached={handleLoadMore}
-            onEndReachedThreshold={0.5}
-            ListFooterComponent={() =>
-              isLoading && page > 1 ? (
-                <View style={tw`py-4`}>
-                  <ActivityIndicator size="small" />
-                </View>
-              ) : null
-            }
-            ListEmptyComponent={() =>
-              !isLoading && (
-                <View style={tw`flex-1 justify-center items-center mt-20`}>
-                  <Ionicons name="file-tray-outline" size={48} color={tw.color("gray-400")} />
-                  <MyText style={tw`text-lg text-gray-500 mt-4`}>No tokens found.</MyText>
-                </View>
-              )
-            }
-          />
-        )}
+        <TokenHistory filters={activeFilters} itemsPerPage={itemsPerPage} />
+        {/* <TokenHistory tokens={Platform.OS === "web" ? data?.tokens || [] : allTokens} /> */}
       </ThemedView>
     </AppContainer>
   );

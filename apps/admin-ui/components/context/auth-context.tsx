@@ -17,7 +17,7 @@ import {
 import { useFocusEffect, usePathname, useRouter } from "expo-router";
 import queryClient from "@/utils/queryClient";
 import { DeviceEventEmitter } from "react-native";
-import { FORCE_LOGOUT_EVENT, SESSION_EXPIRED_MSG } from "@common_ui/src/lib/const-strs";
+import { FORCE_LOGOUT_EVENT, SESSION_EXPIRED_MSG } from "common-ui/src/lib/const-strs";
 import { useLogin, useLogout } from "@/api-hooks/auth.api";
 import {
   useUserResponsibilities,

@@ -1,13 +1,10 @@
 import React from 'react';
 import { View, ActivityIndicator, ScrollView } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-import { tw } from '@common_ui';
+import { useLocalSearchParams , useRouter } from 'expo-router';
+import { tw , MyText , ROLE_NAMES } from 'common-ui';
 import { ThemedView } from '@/components/ThemedView';
-import { MyText } from "@common_ui";
-import { useRouter } from 'expo-router';
 import useHideDrawerHeader from '@/hooks/useHideDrawerHeader';
 import { useRoles } from '@/components/context/roles-context';
-import { ROLE_NAMES } from '@common_ui';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import UserDetailsAdminPov from '@/components/user-details-admin-pov';
 import { Ionicons } from '@expo/vector-icons';

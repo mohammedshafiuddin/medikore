@@ -1,36 +1,27 @@
-import React from "react";
+import React, { useEffect , useState } from "react";
 import { View, StyleSheet, Animated } from "react-native";
 import { Text, TextInput, Button } from "react-native-paper";
 import { useForm, Controller } from "react-hook-form";
 import * as SecureStore from "expo-secure-store";
 
 import { useLogin, LoginResponse } from "@/api-hooks/auth.api";
-import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter , Link } from "expo-router";
 
-import { Link } from "expo-router";
-import { MyButton } from "@common_ui";
-import { MyText } from "@common_ui";
-import { StorageService } from '@common_ui'; // Adjust the import path as necessary
+import { MyButton , MyText , StorageService , tw , MyTextInput , useTheme , BottomDialog } from "common-ui";
+
+import { SESSION_EXPIRED_MSG } from "common-ui/src/lib/const-strs";
+// import { useNotification } from "@/notif-setup/notif-context";
+import { getJWT, JWT_KEY, saveJWT, saveRoles } from "@/hooks/useJWT";
+import { useAuth } from "@/components/context/auth-context";
+import useHideDrawerHeader from "@/hooks/useHideDrawerHeader";
+import { useCurrentUserId } from "@/hooks/useCurrentUserId";
+import DecorativeGraphics from "@/components/decorative-graphics";
+import { useNotification } from "@/services/notif-service/notif-context"; // Adjust the import path as necessary
 
 interface LoginFormInputs {
   login: string;
   password: string;
 }
-
-import { useEffect } from "react";
-import { useState } from "react";
-import { tw } from "@common_ui";
-import { SESSION_EXPIRED_MSG } from "@common_ui/src/lib/const-strs";
-// import { useNotification } from "@/notif-setup/notif-context";
-import { getJWT, JWT_KEY, saveJWT, saveRoles } from "@/hooks/useJWT";
-import { useAuth } from "@/components/context/auth-context";
-import { MyTextInput } from "@common_ui";
-import { useTheme } from "@common_ui";
-import { BottomDialog } from "@common_ui";
-import useHideDrawerHeader from "@/hooks/useHideDrawerHeader";
-import { useCurrentUserId } from "@/hooks/useCurrentUserId";
-import DecorativeGraphics from "@/components/decorative-graphics";
-import { useNotification } from "@/services/notif-service/notif-context";
 
 function Login() {
 

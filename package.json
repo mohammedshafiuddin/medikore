@@ -2,6 +2,7 @@
   "name": "meat-farmer-monorepo",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "npm@10.8.1",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",

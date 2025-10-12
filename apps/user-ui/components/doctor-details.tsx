@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Image, TouchableOpacity, Alert } from 'react-native';
-import { MyText } from '@common_ui';
+import { MyText } from 'common-ui';
 import tw from '@/app/tailwind';
 import { useGetDoctorById, useGetUserById } from '@/api-hooks/user.api';
 import { Ionicons } from '@expo/vector-icons';

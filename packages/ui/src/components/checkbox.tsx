@@ -1,4 +1,4 @@
-import { useTheme } from "@common_ui";
+import { useTheme } from "common-ui";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
 import { Platform, TouchableOpacity, ViewStyle } from 'react-native';

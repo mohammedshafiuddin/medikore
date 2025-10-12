@@ -1,6 +1,6 @@
 import React from "react";
 import { ScrollView, View, StyleSheet } from "react-native";
-import { ImageViewerURI } from "@common_ui";
+import { ImageViewerURI } from "common-ui";
 
 interface HorizontalImageScrollerProps {
   urls: string[];

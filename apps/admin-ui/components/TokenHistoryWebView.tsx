@@ -1,8 +1,8 @@
 import React from 'react';
 import { ScrollView } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
-import { DataTable, tw } from '@common_ui';
-import type { Column } from '@common_ui';
+import { DataTable, tw } from 'common-ui';
+import type { Column } from 'common-ui/src/components/data-table';
 import dayjs from 'dayjs';
 
 // This component assumes it receives fully resolved data and callbacks

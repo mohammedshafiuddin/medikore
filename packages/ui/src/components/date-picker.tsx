@@ -14,7 +14,7 @@ import {
   View,
 } from "react-native";
 import MyText from "./text";
-import { useTheme } from "@common_ui";
+import { useTheme } from "common-ui";
 
 interface Props {
   value: Date | null;

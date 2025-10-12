@@ -1,5 +1,5 @@
-import { AppContainer } from "@common_ui";
-import { MyText } from "@common_ui";
+import { AppContainer } from "common-ui";
+import { MyText } from "common-ui";
 import React, { useState } from "react";
 import {
   View,
@@ -16,7 +16,7 @@ import { getJWT } from "@/hooks/useJWT";
 import tw from "@/app/tailwind";
 import { ThemedView } from "@/components/ThemedView";
 import { useRouter } from "expo-router";
-import { DoctorTokenSummary, DoctorTodayToken } from "@common_ui/shared-types";
+import { DoctorTokenSummary, DoctorTodayToken } from "common-ui/shared-types";
 import { Ionicons } from "@expo/vector-icons";
 import { ErrorToast } from "@/services/toaster";
 import DoctorTokenCard from "./DoctorTokenCard";

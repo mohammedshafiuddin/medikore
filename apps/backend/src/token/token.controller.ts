@@ -13,6 +13,8 @@ import {
   offlineTokensRelations,
   mobileNumbersTable,
   userInfoTable,
+  userRolesTable,
+  roleInfoTable,
 } from "../db/schema";
 import { eq, and, sql, desc, gte, inArray, or, like, lte } from "drizzle-orm";
 import { ApiError } from "../lib/api-error";
@@ -29,6 +31,7 @@ import {
   DoctorTodayToken,
 } from "@commonTypes";
 import { DESIGNATIONS } from "../lib/const-strings";
+import { ROLE_NAMES } from "../lib/roles-manager";
 
 /**
  * Book a token for a doctor
@@ -1098,6 +1101,22 @@ export const createLocalToken = async (
           gender: gender,
         })
         .execute();
+
+      // Assign GENERAL_USER role to new patients
+      const generalUserRole = await tx.query.roleInfoTable.findFirst({
+        where: eq(roleInfoTable.name, ROLE_NAMES.GENERAL_USER)
+      });
+
+      if (generalUserRole) {
+        await tx
+          .insert(userRolesTable)
+          .values({
+            userId: user.id,
+            roleId: generalUserRole.id,
+            addDate: new Date().toISOString().split('T')[0]
+          })
+          .execute();
+      }
     }
 
     console.log({ user });
@@ -1368,6 +1387,247 @@ export const getHospitalTokenHistory = async (
   res.status(200).json({
     message: "Token history retrieved successfully",
     tokens: formattedTokens,
+    totalCount,
+    page,
+    limit,
+  });
+};
+
+/**
+ * Get patient history for a hospital (hospital admin view)
+ * This endpoint returns patient history data with aggregated information
+ *
+ * @param req Request object containing optional page and limit query parameters
+ * @param res Response object
+ * @param next Next function
+ */
+// Mock data generator for testing
+function generateMockPatients(count: number) {
+  const patients = [];
+  const names = [
+    'John Smith', 'Emily Johnson', 'Michael Brown', 'Sarah Davis', 'Robert Wilson',
+    'Jennifer Taylor', 'David Miller', 'Lisa Anderson', 'James Wilson', 'Patricia Johnson',
+    'Robert Garcia', 'Jennifer Martinez', 'William Rodriguez', 'Linda Hernandez', 'David Lopez',
+    'Elizabeth Gonzalez', 'Richard Wilson', 'Barbara Anderson', 'Joseph Thomas', 'Susan Jackson',
+    'Thomas White', 'Jessica Harris', 'Christopher Martin', 'Ashley Thompson', 'Daniel Garcia',
+    'Amanda Martinez', 'Matthew Robinson', 'Kimberly Clark', 'Joshua Rodriguez', 'Donna Lewis'
+  ];
+  const mobiles = [
+    '9876543210', '8765432109', '7654321098', '6543210987', '5432109876',
+    '4321098765', '3210987654', '2109876543', '9876543211', '8765432101',
+    '7654321091', '6543210981', '5432109871', '4321098761', '3210987651',
+    '2109876541', '9876543212', '8765432102', '7654321092', '6543210982',
+    '5432109872', '4321098762', '3210987652', '2109876542', '9876543213',
+    '8765432103', '7654321093', '6543210983', '5432109873', '4321098763'
+  ];
+
+  for (let i = 1; i <= count; i++) {
+    const nameIndex = (i - 1) % names.length;
+    const mobileIndex = (i - 1) % mobiles.length;
+
+    patients.push({
+      id: i,
+      name: names[nameIndex],
+      mobile: mobiles[mobileIndex],
+      age: 25 + (i % 50), // Ages between 25-74
+      gender: i % 2 === 0 ? 'Female' : 'Male',
+      totalTokens: Math.floor(Math.random() * 20) + 1,
+      completedTokens: Math.floor(Math.random() * 15) + 1,
+      upcomingTokens: Math.floor(Math.random() * 5),
+      firstVisitDate: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      lastVisitDate: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      tokens: [] // Empty for mock data
+    });
+  }
+
+  return patients;
+}
+
+export const getHospitalPatientHistory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const userId = req.user?.userId;
+
+  if (!userId) {
+    throw new ApiError("User not authenticated", 401);
+  }
+
+  // Authorization: Ensure user is a hospital admin
+  const hospitalEmployee = await db.query.hospitalEmployeesTable.findFirst({
+    where: eq(hospitalEmployeesTable.userId, userId),
+  });
+
+  if (
+    !hospitalEmployee ||
+    hospitalEmployee.designation !== DESIGNATIONS.HOSPITAL_ADMIN
+  ) {
+    throw new ApiError("Not authorized to view patient history", 403);
+  }
+
+  // Check if mock data is requested (for testing)
+  const useMockData = req.query.mock === 'true' || process.env.USE_MOCK_PATIENT_DATA === 'true';
+
+  if (useMockData) {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const offset = (page - 1) * limit;
+
+    const mockPatients = generateMockPatients(30);
+    const paginatedPatients = mockPatients.slice(offset, offset + limit);
+
+    return res.status(200).json({
+      message: "Mock patient history retrieved successfully",
+      patients: paginatedPatients,
+      totalCount: mockPatients.length,
+      page,
+      limit,
+    });
+  }
+
+  const hospitalId = hospitalEmployee.hospitalId;
+
+  // Get all doctors in the admin's hospital to establish the base scope
+  const hospitalDoctors = await db.query.hospitalEmployeesTable.findMany({
+    where: and(
+      eq(hospitalEmployeesTable.hospitalId, hospitalId),
+      eq(hospitalEmployeesTable.designation, DESIGNATIONS.DOCTOR)
+    ),
+  });
+
+  const hospitalDoctorIds = hospitalDoctors.map((doctor) => doctor.userId);
+
+  if (hospitalDoctorIds.length === 0) {
+    return res.status(200).json({
+      message: "No doctors found in this hospital",
+      patients: [],
+      totalCount: 0,
+      page: 1,
+      limit: 10,
+    });
+  }
+
+  // --- Filter Logic ---
+  const {
+    patientIds: patientIdsQuery,
+    doctorIds: doctorIdsQuery,
+    statuses: statusesQuery,
+    startDate,
+    endDate,
+  } = req.query;
+
+  const conditions = [inArray(tokenInfoTable.doctorId, hospitalDoctorIds)];
+
+  if (patientIdsQuery) {
+    const filteredPatientIds = (patientIdsQuery as string)
+      .split(",")
+      .map(Number);
+    if (filteredPatientIds.length > 0) {
+      conditions.push(inArray(tokenInfoTable.userId, filteredPatientIds));
+    }
+  }
+
+  if (doctorIdsQuery) {
+    const filteredDoctorIds = (doctorIdsQuery as string)
+      .split(",")
+      .map(Number);
+    if (filteredDoctorIds.length > 0) {
+      conditions.push(inArray(tokenInfoTable.doctorId, filteredDoctorIds));
+    }
+  }
+  
+  if (statusesQuery) {
+    const filteredStatuses = (statusesQuery as string).split(",");
+    if (filteredStatuses.length > 0) {
+      conditions.push(inArray(tokenInfoTable.status, filteredStatuses));
+    }
+  }
+
+  if (startDate) {
+    conditions.push(gte(tokenInfoTable.tokenDate, startDate as string));
+  }
+
+  if (endDate) {
+    conditions.push(lte(tokenInfoTable.tokenDate, endDate as string));
+  }
+
+  // --- Pagination ---
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const offset = (page - 1) * limit;
+
+  const combinedConditions = and(...conditions);
+
+  // --- Database Query ---
+  // First, get all tokens that match our criteria
+  const tokens = await db.query.tokenInfoTable.findMany({
+    where: combinedConditions,
+    with: {
+      user: {
+        with: {
+          mobileNumber: true,
+        },
+      },
+      doctor: true,
+    },
+    orderBy: [desc(tokenInfoTable.tokenDate), tokenInfoTable.queueNum],
+  });
+
+  // Group tokens by patient (userId)
+  const tokensByPatient: { [userId: number]: typeof tokens } = {};
+  for (const token of tokens) {
+    if (!tokensByPatient[token.userId]) {
+      tokensByPatient[token.userId] = [];
+    }
+    tokensByPatient[token.userId].push(token);
+  }
+
+  // Convert to patient objects with aggregated data
+  const allPatients = Object.entries(tokensByPatient).map(([userId, userTokens]) => {
+    // Get the first and last visit dates
+    const sortedTokens = [...userTokens].sort((a, b) =>
+      new Date(a.tokenDate).getTime() - new Date(b.tokenDate).getTime()
+    );
+    
+    const firstVisitDate = sortedTokens.length > 0 ? sortedTokens[0].tokenDate : '';
+    const lastVisitDate = sortedTokens.length > 0 ? sortedTokens[sortedTokens.length - 1].tokenDate : '';
+
+    // Count tokens by status
+    const totalTokens = userTokens.length;
+    const completedTokens = userTokens.filter(t => t.status === 'COMPLETED').length;
+    const upcomingTokens = userTokens.filter(t => t.status === 'UPCOMING').length;
+
+    return {
+      id: userTokens[0].user.id,
+      name: userTokens[0].user.name,
+      mobile: userTokens[0].user.mobileNumber?.mobile || '',
+      age: (userTokens[0].user as any).age || 0, // Cast to any for now
+      gender: (userTokens[0].user as any).gender || '', // Cast to any for now
+      totalTokens,
+      completedTokens,
+      upcomingTokens,
+      firstVisitDate,
+      lastVisitDate,
+      tokens: userTokens.map(token => ({
+        id: token.id,
+        queueNum: token.queueNum,
+        tokenDate: token.tokenDate,
+        doctorName: token.doctor.name,
+        status: token.status,
+        description: token.description,
+        consultationNotes: token.consultationNotes || undefined,
+      }))
+    };
+  });
+
+  // Apply pagination to the patient list
+  const totalCount = allPatients.length;
+  const paginatedPatients = allPatients.slice(offset, offset + limit);
+
+  res.status(200).json({
+    message: "Patient history retrieved successfully",
+    patients: paginatedPatients,
     totalCount,
     page,
     limit,

@@ -1,8 +1,6 @@
-import { MyText } from "@common_ui";
-import { MyButton } from "@common_ui";
+import { MyText , MyButton , tw } from "common-ui";
 import React from "react";
 import { ScrollView, View, ActivityIndicator, Alert } from "react-native";
-import { tw } from "@common_ui";
 import { useRouter } from "expo-router";
 import { useGetBusinessUsers, BusinessUser } from "@/api-hooks/user.api";
 import { MaterialIcons } from '@expo/vector-icons';

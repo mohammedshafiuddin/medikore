@@ -3,7 +3,7 @@ import { View, ActivityIndicator } from "react-native";
 import tw from "@/app/tailwind";
 import UserDashboard from "@/components/user-dashboard";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { MyText } from "@common_ui";
+import { MyText } from "common-ui";
 import { ThemedView } from "@/components/ThemedView";
 import { useRoles } from "@/components/context/roles-context";
 import { ROLE_NAMES } from "@/lib/constants";

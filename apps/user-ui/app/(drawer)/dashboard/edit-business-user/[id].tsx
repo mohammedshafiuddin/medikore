@@ -1,4 +1,4 @@
-import { MyText } from '@common_ui';
+import { MyText } from 'common-ui';
 import React from 'react';
 import { ScrollView, View, ActivityIndicator } from 'react-native';
 import tw from '@/app/tailwind';

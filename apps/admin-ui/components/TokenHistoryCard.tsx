@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { MyText, tw } from '@common_ui';
+import { MyText, tw } from 'common-ui';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import dayjs from 'dayjs';

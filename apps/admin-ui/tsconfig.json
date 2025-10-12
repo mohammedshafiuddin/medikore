@@ -7,9 +7,10 @@
         "./*"
       ],
       "shared-types": ["../shared-types"],
-      "@common_ui": ["../../packages/ui"],
-      "@common_ui/*": ["../../packages/ui/*"]
-    }
+      "common-ui": ["../../packages/ui"],
+      "common-ui/*": ["../../packages/ui/*"]
+    },
+    "moduleSuffixes": [".ios", ".android", ".native", ".web", ""]
   },
   "include": [
     "**/*.ts",

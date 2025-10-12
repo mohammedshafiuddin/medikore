@@ -4,7 +4,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Stack , usePathname } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
@@ -13,7 +13,6 @@ import { View } from "react-native";
 import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "@/utils/queryClient";
 import { AuthProvider } from "@/components/context/auth-context";
-import { usePathname } from "expo-router";
 import Toast from "react-native-toast-message";
 import { NotificationProvider } from "@/services/notif-service/notif-context";
 import { Provider as PaperProvider } from 'react-native-paper';

@@ -8,8 +8,7 @@ import {
   Alert,
   TextInput,
 } from "react-native";
-import { tw } from "@common_ui";
-import { MyText } from "@common_ui";
+import { tw , MyText } from "common-ui";
 import { ThemedView } from "@/components/ThemedView";
 import { useAuth } from "@/components/context/auth-context";
 import { useHospitalAdminDashboard } from "@/api-hooks/hospital.api";
@@ -20,7 +19,7 @@ import {
 import { ErrorToast, SuccessToast } from "@/services/toaster";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { DashboardDoctor } from "@common_ui/shared-types";
+import { DashboardDoctor } from "common-ui/shared-types";
 import OfflineTokenDialog from "./OfflineTokenDialog";
 
 interface HospitalAdminDashboardProps {

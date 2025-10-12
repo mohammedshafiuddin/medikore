@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, TouchableOpacity } from 'react-native';
-import { MyText } from "@common_ui";
-import { tw } from '@common_ui';
+import { MyText , tw } from "common-ui";
 
 interface TabNavigationProps {
   tabs: { key: string; title: string }[];

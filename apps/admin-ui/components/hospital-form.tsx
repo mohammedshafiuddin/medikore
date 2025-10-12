@@ -2,9 +2,7 @@ import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { View, ScrollView } from "react-native";
-import { tw } from "@common_ui";
-import { MyTextInput } from "@common_ui";
-import { MyButton } from "@common_ui";
+import { tw , MyTextInput , MyButton , CustomDropdown , MyText , MultiSelectDropdown , ImageUploader } from "common-ui";
 import { useNavigation } from "@react-navigation/native";
 import {
   useGetHospitalById,
@@ -16,14 +14,10 @@ import {
 import { useGetPotentialDoctorEmployees } from "@/api-hooks/hospital-admin.api";
 import { ErrorToast, SuccessToast } from "@/services/toaster";
 import AppContainer from "@/components/app-container";
-import { CustomDropdown } from "@common_ui";
-import { MyText } from "@common_ui";
-import { MultiSelectDropdown } from "@common_ui";
 import { Chip } from "react-native-paper";
 import { useIsAdmin, useRoles } from "./context/roles-context";
 import { useIsHospitalAdmin } from "./context/auth-context";
 import usePickImage from "@/hooks/usePickImage";
-import { ImageUploader } from "@common_ui";
 
 const HospitalSchema = Yup.object().shape({
   name: Yup.string().required("Hospital name is required"),

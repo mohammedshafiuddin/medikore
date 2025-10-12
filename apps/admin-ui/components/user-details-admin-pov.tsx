@@ -7,13 +7,10 @@ import {
   Alert,
   TouchableOpacity,
 } from "react-native";
-import { MyTextInput as TextInput } from "@common_ui";
+import { MyTextInput as TextInput , tw , MyText , MyButton , BottomDialog , DatePicker , Checkbox } from "common-ui";
 import { useRouter } from "expo-router";
-import { tw } from "@common_ui";
 import DoctorDetails from "@/components/doctor-details";
 import { ThemedView } from "@/components/ThemedView";
-import { MyText } from "@common_ui";
-import { MyButton } from "@common_ui";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import {
@@ -21,16 +18,12 @@ import {
   useUpdateDoctorAvailability,
 } from "@/api-hooks/token.api";
 import { useGetUserById, useUpdateBusinessUser } from "@/api-hooks/user.api";
-import { BottomDialog } from "@common_ui";
-import { User, DashboardDoctor } from "@common_ui/shared-types";
+import { User, DashboardDoctor } from "common-ui/shared-types";
 import AppContainer from "./app-container";
-import { DatePicker } from "@common_ui";
 import {
   useMarkDoctorLeave,
   useGetDoctorUpcomingLeaves,
-} from "@/api-hooks/doctor.api";
-import { Checkbox } from "@common_ui";
-import { useUpdateDoctorInning } from "@/api-hooks/doctor.api";
+  useUpdateDoctorInning } from "@/api-hooks/doctor.api";
 import OfflineTokenDialog from "./OfflineTokenDialog";
 
 interface AdminDoctorDetailsProps {
@@ -911,6 +904,14 @@ export default function UserDetailsAdminPov({
   // Fetch doctor details for the doctor name in the dialog
   const { data: doctorDetails } = useGetUserById(doctorId);
 
+  // Check today's availability for offline token button
+  const { data: availabilityData } = useGetDoctorAvailabilityForNextDays(doctorId, false);
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayAvailability = availabilityData?.availabilities?.find(
+    (a: any) => a.date === todayStr
+  )?.availability;
+  const hasAvailability = todayAvailability && todayAvailability.totalTokenCount > 0;
+
   return (
     <AppContainer>
       <DoctorDetails 
@@ -920,10 +921,17 @@ export default function UserDetailsAdminPov({
       />
       <View style={tw`p-4`}>
         <TouchableOpacity
-          style={tw`bg-blue-500 p-4 rounded-xl items-center`}
-          onPress={() => setIsOfflineTokenDialogOpen(true)}
+          style={tw`p-4 rounded-xl items-center ${
+            hasAvailability
+              ? 'bg-blue-500'
+              : 'bg-gray-400'
+          }`}
+          onPress={() => hasAvailability && setIsOfflineTokenDialogOpen(true)}
+          disabled={!hasAvailability}
         >
-          <MyText style={tw`text-white font-bold`}>Book Offline Token</MyText>
+          <MyText style={tw`text-white font-bold`}>
+            {hasAvailability ? 'Book Offline Token' : 'No Slots Available Today'}
+          </MyText>
         </TouchableOpacity>
       </View>
       <OfficeInningSection doctorId={doctorId} />

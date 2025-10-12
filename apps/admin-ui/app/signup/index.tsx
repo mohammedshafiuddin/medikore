@@ -1,9 +1,6 @@
-import { MyText } from "@common_ui";
+import { MyText , MyTextInput , MyButton , useTheme , tw } from "common-ui";
 import React from "react";
 import { View, Alert, Image, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
-import { MyTextInput } from "@common_ui";
-import { MyButton } from "@common_ui";
-import { useTheme } from "@common_ui";
 import {
   CreateUserPayload,
   useCreateBusinessUser,
@@ -13,7 +10,6 @@ import {
 import { useRouter } from "expo-router";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { tw } from "@common_ui";
 import useHideDrawerHeader from "@/hooks/useHideDrawerHeader";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import usePickImage from "@/hooks/usePickImage";

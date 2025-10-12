@@ -3,7 +3,7 @@ import { View, ActivityIndicator, ScrollView } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import tw from '@/app/tailwind';
 import { ThemedView } from '@/components/ThemedView';
-import { MyText } from '@common_ui';
+import { MyText } from 'common-ui';
 import { useRouter } from 'expo-router';
 import useHideDrawerHeader from '@/hooks/useHideDrawerHeader';
 import { useRoles } from '@/components/context/roles-context';

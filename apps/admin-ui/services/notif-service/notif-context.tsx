@@ -10,7 +10,7 @@ import * as Notifications from "expo-notifications";
 import { registerForPushNotificationsAsync } from "./notif-register";
 import { useRouter } from "expo-router";
 import { NotificationToast } from "../toaster";
-import { NOTIF_PERMISSION_DENIED } from "@common_ui/src/lib/const-strs";
+import { NOTIF_PERMISSION_DENIED } from "common-ui/src/lib/const-strs";
 
 interface NotificationContextType {
   expoPushToken: string | null;

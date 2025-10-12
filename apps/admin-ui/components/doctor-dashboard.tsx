@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
 import { View, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import { tw } from '@common_ui';
-import { MyText } from "@common_ui";
+import { tw , MyText } from 'common-ui';
 import { ThemedView } from '@/components/ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { useDoctorTodaysTokens, useHospitalTodaysTokens } from '@/api-hooks/token.api';
+import { useDoctorTodaysTokens, useHospitalTodaysTokens , useUpdateTokenStatus } from '@/api-hooks/token.api';
 import { useCurrentUserId } from '@/hooks/useCurrentUserId';
 import { DoctorTodayToken } from 'shared-types';
 import DoctorTokenCard from '@/app/(drawer)/todays-tokens/DoctorTokenCard';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useUpdateTokenStatus } from '@/api-hooks/token.api';
 
 interface Props {}
 

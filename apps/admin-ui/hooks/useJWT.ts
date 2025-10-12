@@ -1,5 +1,5 @@
 // import { StorageService } from '@/lib/StorageService';
-import {StorageService} from '@common_ui';
+import {StorageService} from 'common-ui';
 
 export const JWT_KEY = 'jwt_token';
 export const ROLES_KEY = 'user_roles';

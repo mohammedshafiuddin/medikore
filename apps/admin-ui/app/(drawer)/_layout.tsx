@@ -26,19 +26,16 @@ import {
 } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import { IconButton } from "react-native-paper";
-import { colors } from "@common_ui";
-import { tw } from "@common_ui";
-import { useTheme } from "@common_ui";
-import { MyText } from "@common_ui";
-import { MyButton } from "@common_ui";
+import { colors , tw , useTheme , MyText , MyButton , ROLE_NAMES } from "common-ui";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRoles } from "@/components/context/roles-context";
 import { useAuth } from "@/components/context/auth-context";
 import { useCurrentUserId } from "@/hooks/useCurrentUserId";
 import { useGetUserById } from "../../api-hooks/user.api";
 import { useGetMyDoctors } from "@/api-hooks/my-doctors.api";
-import { ROLE_NAMES } from "@common_ui";
 import DashboardHeader from "@/components/dashboard-header";
+import { NavigationContainer } from "@react-navigation/native";
+
 
 interface Props {}
 
@@ -48,7 +45,6 @@ function _layout(props: Props) {
   const { theme } = useTheme();
 
   const roles = useRoles();
-  const isAdmin = roles?.includes("admin");
   const isHospitalAdmin = roles?.includes(ROLE_NAMES.HOSPITAL_ADMIN);
   const router = useRouter();
 
@@ -74,7 +70,9 @@ function _layout(props: Props) {
 
   return (
     <View style={{ flexGrow: 1, backgroundColor: theme.colors.gray3 }}>
+
       <Drawer
+        backBehavior="history"
         drawerContent={(props) => <CustomDrawerContent {...props} />}
         screenOptions={({ navigation }) => ({
           headerShown: true,
@@ -281,6 +279,33 @@ function _layout(props: Props) {
             ),
           }}
         />
+        <Drawer.Screen
+          name="my-patients"
+          options={{
+            title: "My Patients",
+            headerShown: true,
+            drawerStyle: { display: "none" },
+            drawerIcon: ({
+              color,
+              focused,
+            }: {
+              focused: boolean;
+              color: string;
+            }) => (
+              <MaterialCommunityIcons
+                name="account-multiple"
+                size={24}
+                color={focused ? theme.colors.blue1 : theme.colors.gray1}
+              />
+            ),
+          }}
+        />
+        <Drawer.Screen
+          name="patient-details"
+          options={{
+            drawerItemStyle: { display: "none" },
+          }}
+        />
       </Drawer>
     </View>
   );
@@ -317,6 +342,7 @@ function CustomDrawerContent(props: any) {
     "payment-failed",
     "appointments",
     "index",
+    "patient-details",
   ];
   const adminOnlyRoutes = ["admin-panel"];
   const genUserOnlyRoutes = ["my-tokens"];

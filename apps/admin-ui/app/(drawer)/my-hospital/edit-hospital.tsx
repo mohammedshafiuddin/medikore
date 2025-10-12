@@ -1,9 +1,8 @@
 import React from 'react';
 import { ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { tw } from '@common_ui';
+import { tw , MyText } from 'common-ui';
 import { ThemedView } from '@/components/ThemedView';
-import { MyText } from "@common_ui";
 import useHideDrawerHeader from '@/hooks/useHideDrawerHeader';
 import { useAuth } from '@/components/context/auth-context';
 import AppContainer from '@/components/app-container';

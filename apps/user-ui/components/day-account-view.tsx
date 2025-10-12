@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { MyText } from '@common_ui';
+import { MyText } from 'common-ui';
 import tw from '@/app/tailwind';
 import { Ionicons } from '@expo/vector-icons';
 

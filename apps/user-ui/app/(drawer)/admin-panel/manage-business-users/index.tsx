@@ -1,12 +1,12 @@
-import { MyText } from "@common_ui";
-import { MyButton } from "@common_ui";
+import { MyText } from "common-ui";
+import { MyButton } from "common-ui";
 import React from "react";
 import { ScrollView, View, ActivityIndicator, Alert } from "react-native";
 import tw from "@/app/tailwind";
 import { useRouter } from "expo-router";
 import { useGetBusinessUsers, BusinessUser } from "@/api-hooks/user.api";
 import { MaterialIcons } from '@expo/vector-icons';
-import { AppContainer } from "@common_ui";
+import { AppContainer } from "common-ui";
 
 interface BusinessUserCardProps {
   user: BusinessUser;

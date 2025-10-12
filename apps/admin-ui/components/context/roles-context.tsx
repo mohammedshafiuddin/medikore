@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { AuthContext } from "./auth-context";
-import { ROLE_NAMES } from "@common_ui";
+import { ROLE_NAMES } from "common-ui";
 // import { getRoles, saveRoles, deleteRoles } from "../../hooks/useJWT";
 // import { ROLE_NAMES } from "../../lib/constants";
 

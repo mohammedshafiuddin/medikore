@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, ScrollView, ActivityIndicator } from "react-native";
-import { MyText, tw, CustomDropdown, MyTextInput, MyButton } from "@common_ui";
+import { View, ScrollView, ActivityIndicator, TouchableOpacity } from "react-native";
+import { MyText, tw, CustomDropdown, MyTextInput, MyButton } from "common-ui";
 import { ThemedView } from "@/components/ThemedView";
 import AppContainer from "@/components/app-container";
 import { useGetMyDoctors } from "@/api-hooks/my-doctors.api";
@@ -10,9 +10,11 @@ import {
   useCreateLocalToken,
 } from "@/api-hooks/token.api";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { Formik } from "formik";
-import { GENDERS } from "@common_ui/src/lib/constants";
-import { token_user } from "@common_ui/shared-types";
+import { SuccessToast } from "@/services/toaster";
+import { GENDERS } from "common-ui/src/lib/constants";
+import { token_user } from "common-ui/shared-types";
 import { Chip } from "react-native-paper";
 
 // The form to show after a patient is selected or "add new" is clicked
@@ -91,6 +93,7 @@ const PatientForm = ({
 };
 
 export default function AddTokenScreen() {
+  const router = useRouter();
   const {
     data: doctors,
     isLoading: doctorsLoading,
@@ -138,8 +141,16 @@ export default function AddTokenScreen() {
       };
       // console.log({payload, selectedDoctorId})
       console.log({payload})
-      
-      createLocalToken(payload);
+
+      createLocalToken(payload, {
+        onSuccess: () => {
+          SuccessToast("Token booked successfully!");
+        },
+        onError: (error: any) => {
+          console.error("Error booking token:", error);
+          // Could add ErrorToast here if not handled elsewhere
+        },
+      });
     },
     [selectedDoctorId, createLocalToken]
   );
@@ -239,9 +250,15 @@ export default function AddTokenScreen() {
               size={48}
               color={tw.color("gray-400")}
             />
-            <MyText style={tw`text-gray-500 text-center mt-3`}>
+            <MyText style={tw`text-gray-500 text-center mt-3 mb-4`}>
               No availability information for today
             </MyText>
+            <TouchableOpacity
+              style={tw`bg-blue-500 px-4 py-2 rounded-lg`}
+              onPress={() => router.push(`/(drawer)/dashboard/doctor-details/${selectedDoctorId}` as any)}
+            >
+              <MyText style={tw`text-white font-medium`}>Set Availability</MyText>
+            </TouchableOpacity>
           </View>
         );
       }

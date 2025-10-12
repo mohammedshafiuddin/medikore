@@ -2,16 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { View, Alert } from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { tw } from '@common_ui';
-import { MyText } from "@common_ui";
-import { MyTextInput } from "@common_ui";
-import { MyButton } from '@common_ui';
-import { CustomDropdown, DropdownOption } from '@common_ui';
+import { tw , MyText , MyTextInput , MyButton , CustomDropdown, DropdownOption , MultiSelectDropdown } from 'common-ui';
 import { useRoles } from '@/components/context/roles-context';
 import { useGetPotentialHospitalAdmins, PotentialHospitalAdmin } from '@/api-hooks/hospital.api';
 import { useGetUnassignedDoctors, useAddDoctorsToHospital, useRemoveDoctorFromHospital } from '@/api-hooks/doctor.api';
 import { Doctor } from 'shared-types';
-import { MultiSelectDropdown } from '@common_ui';
 
 // Define validation schema using Yup
 const HospitalSchema = Yup.object().shape({

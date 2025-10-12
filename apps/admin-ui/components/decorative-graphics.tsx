@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useTheme } from "@common_ui";
-import { tw } from '@common_ui';
+import { useTheme , tw } from "common-ui";
 
 interface Props {
   style?: object;
