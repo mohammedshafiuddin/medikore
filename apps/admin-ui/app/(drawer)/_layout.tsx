@@ -284,7 +284,7 @@ function _layout(props: Props) {
           options={{
             title: "My Patients",
             headerShown: true,
-            drawerStyle: { display: "none" },
+            // drawerStyle: { display: "none" },
             drawerIcon: ({
               color,
               focused,
@@ -300,12 +300,12 @@ function _layout(props: Props) {
             ),
           }}
         />
-        <Drawer.Screen
+        {/* <Drawer.Screen
           name="patient-details"
           options={{
-            drawerItemStyle: { display: "none" },
+            drawerStyle: { display: "none" },
           }}
-        />
+        /> */}
       </Drawer>
     </View>
   );

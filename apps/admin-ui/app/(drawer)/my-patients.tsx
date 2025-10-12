@@ -12,12 +12,14 @@ export default function MyPatientsScreen() {
   const [activeFilters, setActiveFilters] = useState({});
 
   return (
-    <AppContainer>
-      <ThemedView style={tw`flex-1`}>
+    <ThemedView style={tw`flex-1`}>
+      <View style={tw`p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700`}>
+        <MyText style={tw`text-xl font-bold text-gray-800 dark:text-white`}>My Patients</MyText>
+        <MyText style={tw`text-gray-600 dark:text-gray-400`}>Manage and view your patients</MyText>
+      </View>
+
+      <AppContainer>
         <View style={tw`p-4`}>
-          <MyText style={tw`text-2xl font-bold text-gray-800 dark:text-white mb-4`}>
-            My Patients
-          </MyText>
           <View style={tw`flex-row items-center mb-4`}>
             <View style={tw`flex-1`}>
               <SearchBar
@@ -104,7 +106,7 @@ export default function MyPatientsScreen() {
         </BottomDialog>
 
         <MyPatients searchQuery={searchQuery} filters={activeFilters} />
-      </ThemedView>
-    </AppContainer>
+      </AppContainer>
+    </ThemedView>
   );
 }

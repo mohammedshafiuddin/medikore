@@ -16,6 +16,7 @@ import { SuccessToast } from "@/services/toaster";
 import { GENDERS } from "common-ui/src/lib/constants";
 import { token_user } from "common-ui/shared-types";
 import { Chip } from "react-native-paper";
+import { StorageServiceCasual } from "common-ui/src/services/StorageServiceCasual";
 
 // The form to show after a patient is selected or "add new" is clicked
 const PatientForm = ({
@@ -92,6 +93,8 @@ const PatientForm = ({
   );
 };
 
+const DOCTOR_SELECTION_KEY = 'selectedDoctorId';
+
 export default function AddTokenScreen() {
   const router = useRouter();
   const {
@@ -142,23 +145,47 @@ export default function AddTokenScreen() {
       // console.log({payload, selectedDoctorId})
       console.log({payload})
 
-      createLocalToken(payload, {
-        onSuccess: () => {
-          SuccessToast("Token booked successfully!");
-        },
-        onError: (error: any) => {
-          console.error("Error booking token:", error);
-          // Could add ErrorToast here if not handled elsewhere
-        },
-      });
+       createLocalToken(payload, {
+         onSuccess: () => {
+           SuccessToast("Token booked successfully!");
+
+           // Reset patient-related form state only
+           setMobileNumber("");
+           setSelectedPatient(null);
+           setShowNewPatientForm(false);
+
+           // Keep the selected doctor unchanged for convenience
+         },
+         onError: (error: any) => {
+           console.error("Error booking token:", error);
+           // Could add ErrorToast here if not handled elsewhere
+         },
+       });
     },
     [selectedDoctorId, createLocalToken]
   );
 
-  // Set the first doctor as selected by default when data loads
+  // Load stored doctor selection on mount
   useEffect(() => {
+    const loadStoredDoctor = async () => {
+      try {
+        const storedDoctorId = await StorageServiceCasual.getItem(DOCTOR_SELECTION_KEY);
+        if (storedDoctorId && doctors) {
+          const doctorExists = doctors.some(doctor => doctor.id === parseInt(storedDoctorId));
+          if (doctorExists) {
+            setSelectedDoctorId(parseInt(storedDoctorId));
+          } else {
+            // Doctor no longer available, clear stored value
+            await StorageServiceCasual.removeItem(DOCTOR_SELECTION_KEY);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading stored doctor:', error);
+      }
+    };
+
     if (doctors && doctors.length > 0 && selectedDoctorId === null) {
-      setSelectedDoctorId(doctors[0].id);
+      loadStoredDoctor();
     }
   }, [doctors, selectedDoctorId]);
 
@@ -170,10 +197,15 @@ export default function AddTokenScreen() {
     })) || [];
 
   // Handle doctor selection
-  const handleDoctorSelection = (doctorId: string | number) => {
-    setSelectedDoctorId(
-      typeof doctorId === "string" ? parseInt(doctorId) : doctorId
-    );
+  const handleDoctorSelection = async (doctorId: string | number) => {
+    const id = typeof doctorId === "string" ? parseInt(doctorId) : doctorId;
+    setSelectedDoctorId(id);
+
+    try {
+      await StorageServiceCasual.setItem(DOCTOR_SELECTION_KEY, id.toString());
+    } catch (error) {
+      console.error('Error saving doctor selection:', error);
+    }
   };
 
   // Loading states
